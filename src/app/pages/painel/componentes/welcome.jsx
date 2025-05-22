@@ -19,8 +19,8 @@ export default function Welcome() {
                     />
                 </div>
                 <div>
-                    <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">Welcome back, Sarah!</h1>
-                    <p className="text-muted-foreground text-lg">Your mock exams are ready</p>
+                    <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">Olá, Sarah!</h1>
+                    <p className="text-muted-foreground text-lg">Veja oque há de novo</p>
                 </div>
             </div>
             <div className="relative hidden md:block">
