@@ -61,6 +61,31 @@ npm run dev
 
 ```
 
-## 👤 Autor
-Desenvolvido por Guilherme Vidichosqui Men (Guimenn), Luked616 e Matheusrike
+## 👥 Colaboradores
+
+<table align="start">
+  <tr>
+    <td align="center">
+      <a href="https://github.com/Guimenn" target="_blank">
+        <img src="https://avatars.githubusercontent.com/Guimenn" width="80" style="border-radius: 50%;" alt="Guimenn" />
+        <br />
+        <sub><b>Guimenn</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/luked616" target="_blank">
+        <img src="https://avatars.githubusercontent.com/luked616" width="80" style="border-radius: 50%;" alt="palmitex" />
+        <br />
+        <sub><b>Luked616</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/matheusrike" target="_blank">
+        <img src="https://avatars.githubusercontent.com/matheusrike" width="80" style="border-radius: 50%;" alt="oQueirozzz" />
+        <br />
+        <sub><b>MatheusRike</b></sub>
+      </a>
+    </td>
+  </tr>
+</table>
 
