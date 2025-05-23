@@ -63,25 +63,25 @@ export default function Overview() {
 
     const dashAdmin = [
         {
-            title: 'Total Users',
+            title: 'Total de Usuários',
             value: 154,
-            subtitle: '+10 this week',
+            subtitle: '+10 nesta semana',
             icon: <FileText className="h-6 w-6 text-primary" />,
             iconBg: 'bg-primary/10',
             textColor: 'text-primary'
         },
         {
-            title: 'Active Professors',
+            title: 'Professores Ativos',
             value: 18,
-            subtitle: '3 new this month',
+            subtitle: '3 novos neste mês',
             icon: <CheckCircle className="h-6 w-6 text-green-600" />,
             iconBg: 'bg-green-100',
             textColor: 'text-green-600'
         },
         {
-            title: 'System Uptime',
+            title: 'Estado do Sistema',
             value: '99.9%',
-            subtitle: 'Stable this month',
+            subtitle: 'Estável',
             icon: <LineChart className="h-6 w-6 text-blue-600" />,
             iconBg: 'bg-blue-100',
             textColor: 'text-blue-600'

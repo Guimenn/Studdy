@@ -15,9 +15,9 @@ export default function Results() {
     return (
         <div>
             <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold">Recent Results</h2>
+                <h2 className="text-2xl font-bold">Resultados Recentes</h2>
                 <Button variant="outline" className="gap-2">
-                    View All Results
+                    Todos os Resultados
                 </Button>
             </div>
             <Card className="overflow-hidden">
@@ -25,9 +25,9 @@ export default function Results() {
                     <Table>
                         <TableHeader>
                             <TableRow className="bg-slate-50">
-                                <TableHead className="font-semibold">Exam Name</TableHead>
-                                <TableHead className="font-semibold">Date</TableHead>
-                                <TableHead className="font-semibold">Score</TableHead>
+                                <TableHead className="font-semibold">Simulado</TableHead>
+                                <TableHead className="font-semibold">Data</TableHead>
+                                <TableHead className="font-semibold">Pontuação</TableHead>
                                 <TableHead className="font-semibold">Status</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -41,7 +41,7 @@ export default function Results() {
                                         variant="outline"
                                         className="bg-green-100 text-green-800 hover:bg-green-100 px-3 py-1"
                                     >
-                                        Passed
+                                        Aprovado
                                     </Badge>
                                 </TableCell>
                             </TableRow>
@@ -54,7 +54,7 @@ export default function Results() {
                                         variant="outline"
                                         className="bg-green-100 text-green-800 hover:bg-green-100 px-3 py-1"
                                     >
-                                        Passed
+                                        Aprovado
                                     </Badge>
                                 </TableCell>
                             </TableRow>
@@ -67,7 +67,7 @@ export default function Results() {
                                         variant="outline"
                                         className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100 px-3 py-1"
                                     >
-                                        Review
+                                        Em Revisão
                                     </Badge>
                                 </TableCell>
                             </TableRow>

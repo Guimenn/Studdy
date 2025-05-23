@@ -85,7 +85,7 @@ export default function MaterialPage() {
             </h1>
 
             <Tabs defaultValue="videoaulas" className="space-y-4">
-                <TabsList className="grid grid-cols-4 w-full max-w-2xl">
+                <TabsList className="grid grid-cols-4 w-full max-w-2xl ">
                     <TabsTrigger value="videoaulas" className="flex items-center gap-2">
                         <Video className="h-4 w-4" />
                         Videoaulas

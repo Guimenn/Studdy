@@ -50,13 +50,9 @@ const plataformas = [
 export default function PlataformasAprendizagem() {
     const { userRole } = useUser();
     const Nome =
-        userRole === 'professor'
-            ? 'Plataformas de Ensino'
-            : 'Plataformas de Aprendizagem'
-    // ? dashProfessor
-    // : userRole === 'admin'
-    //     ? dashAdmin
-    //     : dashAlunos;
+        userRole === 'aluno'
+            ? 'Plataformas de Aprendizagem'
+            : 'Plataformas de Ensino'
 
     return (
         <div className="mb-8">
