@@ -34,7 +34,7 @@ export default function TurmaDetalhesPage() {
         setIsLoading(true);
         setError(null);
         const token = Cookies.get('token');
-        const turmaResponse = await fetch(`http://localhost:3000/admin/classes/${params.id}`, {
+        const turmaResponse = await fetch(`https://api-studdy.onrender.com/admin/classes/${params.id}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

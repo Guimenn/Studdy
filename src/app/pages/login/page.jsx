@@ -45,7 +45,7 @@ export default function LoginPage() {
 		try {
 
 			console.log('Dados enviados:', data);
-			const response = await fetch('http://localhost:3000/login', {
+			const response = await fetch('https://api-studdy.onrender.com/login', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

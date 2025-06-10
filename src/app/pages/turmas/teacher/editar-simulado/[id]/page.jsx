@@ -118,7 +118,7 @@ export default function EditarSimuladoPage() {
                 }
 
                 console.log('Carregando simulado com ID:', quizId);
-                const response = await fetch(`http://localhost:3000/quiz/${quizId}`, {
+                const response = await fetch(`https://api-studdy.onrender.com/quiz/${quizId}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -268,9 +268,9 @@ export default function EditarSimuladoPage() {
                 }))
             };
             console.log('Dados a serem enviados:', payload);
-            console.log('URL da requisição:', `http://localhost:3000/teacher/quiz/${quizId}`);
+            console.log('URL da requisição:', `https://api-studdy.onrender.com/teacher/quiz/${quizId}`);
 
-            const response = await fetch(`http://localhost:3000/teacher/quiz/${quizId}`, {
+            const response = await fetch(`https://api-studdy.onrender.com/teacher/quiz/${quizId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

@@ -125,7 +125,7 @@ export default function CriarSimuladosPage() {
 				}
 
 				console.log('Buscando turmas...');
-				const response = await fetch('http://localhost:3000/teacher/classes', {
+				const response = await fetch('https://api-studdy.onrender.com/teacher/classes', {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -166,7 +166,7 @@ export default function CriarSimuladosPage() {
 						return;
 					}
 
-					const response = await fetch(`http://localhost:3000/teacher/classes/${selectedClass}/subjects`, {
+					const response = await fetch(`https://api-studdy.onrender.com/teacher/classes/${selectedClass}/subjects`, {
 						headers: {
 							'Authorization': `Bearer ${token}`
 						}
@@ -210,7 +210,7 @@ export default function CriarSimuladosPage() {
 						return;
 					}
 
-					const response = await fetch(`http://localhost:3000/teacher/simulados/${editId}`, {
+					const response = await fetch(`https://api-studdy.onrender.com/teacher/simulados/${editId}`, {
 						headers: {
 							'Authorization': `Bearer ${token}`
 						}
@@ -299,8 +299,8 @@ export default function CriarSimuladosPage() {
 			
 			// Determinar URL e método baseado no modo de edição
 			const url = isEditMode 
-				? `http://localhost:3000/teacher/simulados/${editId}`
-				: `http://localhost:3000/teacher/classes/${selectedClass}/subjects/${selectedSubject}/quiz`;
+				? `https://api-studdy.onrender.com/teacher/simulados/${editId}`
+                : `https://api-studdy.onrender.com/teacher/classes/${selectedClass}/subjects/${selectedSubject}/quiz`;
 			
 			const method = isEditMode ? 'PUT' : 'POST';
 

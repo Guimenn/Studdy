@@ -17,10 +17,10 @@ import { PageLoader } from "@/components/ui/loader";
 import Cookies from 'js-cookie';
 
 const API_ENDPOINTS = {
-    student: "http://localhost:3000/admin/students",
-    teacher: "http://localhost:3000/admin/teachers",
-    classes: "http://localhost:3000/admin/classes",
-    subjects: "http://localhost:3000/admin/subjects"
+    student: "https://api-studdy.onrender.com/admin/students",
+        teacher: "https://api-studdy.onrender.com/admin/teachers",
+        classes: "https://api-studdy.onrender.com/admin/classes",
+        subjects: "https://api-studdy.onrender.com/admin/subjects"
 };
 
 const SHIFT_OPTIONS = [

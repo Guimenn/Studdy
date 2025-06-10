@@ -95,7 +95,7 @@ export default function Dashboard() {
 				setLoading(true);
 
 				// Buscar dados do usuário
-				const userResponse = await fetch(`http://localhost:3000/user/${userId}`, {
+				const userResponse = await fetch(`https://api-studdy.onrender.com/user/${userId}`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -112,13 +112,13 @@ export default function Dashboard() {
 				let endpoint = '';
 				switch (userRole) {
 					case 'student':
-						endpoint = 'http://localhost:3000/student/status';
+						endpoint = 'https://api-studdy.onrender.com/student/status';
 						break;
 					case 'teacher':
-						endpoint = 'http://localhost:3000/teacher/status';
+						endpoint = 'https://api-studdy.onrender.com/teacher/status';
 						break;
 					case 'admin':
-						endpoint = 'http://localhost:3000/admin/status';
+						endpoint = 'https://api-studdy.onrender.com/admin/status';
 						break;
 					default:
 						setLoading(false);

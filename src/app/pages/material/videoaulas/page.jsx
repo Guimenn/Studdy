@@ -24,7 +24,7 @@ export default function VideoaulasPage() {
                     return;
                 }
 
-                const response = await fetch('http://localhost:3000/student/videos', {
+                const response = await fetch('https://api-studdy.onrender.com/student/videos', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -195,4 +195,4 @@ export default function VideoaulasPage() {
             </div>
         </div>
     );
-} 
+}

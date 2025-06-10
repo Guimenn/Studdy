@@ -91,7 +91,7 @@ function QuestionForm({ questionId, numeroQuestao, onAddQuestion, onDeleteQuesti
                 correct_answer: data.correct_answer
             };
 
-            const response = await fetch(`http://localhost:3000/generate/generate-alternatives`, {
+            const response = await fetch(`https://api-studdy.onrender.com/generate/generate-alternatives`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

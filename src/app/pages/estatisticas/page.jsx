@@ -1,4 +1,4 @@
-    'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,7 +18,7 @@ export default function EstatisticasPage() {
                 setIsLoading(true);
                 const token = Cookies.get('token');
                 
-                const response = await fetch('http://localhost:3000/student/status', {
+                const response = await fetch('https://api-studdy.onrender.com/student/status', {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
@@ -323,4 +323,4 @@ export default function EstatisticasPage() {
             </div>
         </div>
     );
-} 
+}

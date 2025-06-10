@@ -89,7 +89,7 @@ export default function SimuladoQuestoesPage() {
         if (!token) return null;
 
         try {
-            const quizzesResponse = await fetch('http://localhost:3000/student/quizzes', {
+            const quizzesResponse = await fetch('https://api-studdy.onrender.com/student/quizzes', {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -193,7 +193,7 @@ export default function SimuladoQuestoesPage() {
                     subjectId = simulado.subject.id;
                 } else {
                     // Se não temos o simulado carregado, precisamos buscar o subject_id
-                    const quizInfoResponse = await fetch(`http://localhost:3000/quiz/${params.id}`, {
+                    const quizInfoResponse = await fetch(`https://api-studdy.onrender.com/quiz/${params.id}`, {
                         method: 'GET',
                         headers: {
                             'Content-Type': 'application/json',
@@ -215,7 +215,7 @@ export default function SimuladoQuestoesPage() {
                 }
 
                 // Iniciar novo attempt
-                const response = await fetch(`http://localhost:3000/student/subjects/${subjectId}/quizzes/${params.id}/start`, {
+                const response = await fetch(`https://api-studdy.onrender.com/student/subjects/${subjectId}/quizzes/${params.id}/start`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -239,7 +239,7 @@ export default function SimuladoQuestoesPage() {
             // Verificar se é um attempt em progresso ou um novo attempt
             if (currentQuiz && currentQuiz.hasInProgressAttempt) {
                 // Para attempt em progresso, precisamos buscar as questões separadamente
-                const quizResponse = await fetch(`http://localhost:3000/quiz/${params.id}`, {
+                const quizResponse = await fetch(`https://api-studdy.onrender.com/quiz/${params.id}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -406,7 +406,7 @@ export default function SimuladoQuestoesPage() {
             console.log('Attempt ID:', attempt.id);
 
             // Enviar as respostas
-            const submitResponse = await fetch(`http://localhost:3000/student/attempt/${attempt.id}/submit`, {
+            const submitResponse = await fetch(`https://api-studdy.onrender.com/student/attempt/${attempt.id}/submit`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -419,7 +419,7 @@ export default function SimuladoQuestoesPage() {
             console.log('Resposta da tentativa:', submitData);
 
             // Marcar o attempt como completed
-            await fetch(`http://localhost:3000/student/attempt/${attempt.id}`, {
+            await fetch(`https://api-studdy.onrender.com/student/attempt/${attempt.id}`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,

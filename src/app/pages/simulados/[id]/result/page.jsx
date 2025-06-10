@@ -28,7 +28,7 @@ export default function SimuladoResultadoPage() {
                 if (!token) throw new Error("Token não encontrado");
 
                 console.log('Buscando resultados para tentativa:', attemptId);
-                const response = await fetch(`http://localhost:3000/student/attempt/${attemptId}/responses`, {
+                const response = await fetch(`https://api-studdy.onrender.com/student/attempt/${attemptId}/responses`, {
                     headers: {
                         "Authorization": `Bearer ${token}`,
                         "Content-Type": "application/json",
@@ -226,4 +226,4 @@ export default function SimuladoResultadoPage() {
             </div>
         </div>
     );
-} 
+}
