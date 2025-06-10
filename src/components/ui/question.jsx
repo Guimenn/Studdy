@@ -1,69 +1,102 @@
 'use client';
 
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
-import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useState, useEffect, useCallback } from 'react';
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { MinusCircle } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
-
-import Alert from "@/components/ui/alerts";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { MinusCircle } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { toast } from 'sonner';
+import Cookies from 'js-cookie';
 
 const formSchema = z.object({
-    pergunta: z.string().min(1, "Digite uma pergunta"),
-    respostaCorreta: z.string().min(1, "Digite a resposta correta"),
+    question: z.string().min(1, 'A pergunta é obrigatória'),
+    correct_answer: z.string().min(1, 'A resposta correta é obrigatória')
 });
 
-function QuestionForm({ numeroQuestao, onAddQuestion, onDeleteQuestion }) {
+function QuestionForm({ questionId, numeroQuestao, onAddQuestion, onDeleteQuestion, onAlternativesGenerated, existingQuestion, onQuestionChange }) {
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [submitError, setSubmitError] = useState(null);
-    const [submitSuccess, setSubmitSuccess] = useState(false);
     const [alternativas, setAlternativas] = useState({
-        alternativa1: '',
-        alternativa2: '',
-        alternativa3: ''
+        alternativa1: existingQuestion?.alternatives?.find(alt => !alt.isCorrect)?.text || '',
+        alternativa2: existingQuestion?.alternatives?.filter(alt => !alt.isCorrect)[1]?.text || '',
+        alternativa3: existingQuestion?.alternatives?.filter(alt => !alt.isCorrect)[2]?.text || ''
     });
 
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            pergunta: "",
-            respostaCorreta: ""
-        },
+            question: existingQuestion?.statement || '',
+            correct_answer: existingQuestion?.alternatives?.find(alt => alt.isCorrect)?.text || ''
+        }
     });
+
+    const question = form.watch('question');
+    const correctAnswer = form.watch('correct_answer');
+
+    // Função para atualizar a questão
+    const updateQuestion = useCallback(() => {
+        if (!onQuestionChange) return;
+
+            const updatedQuestion = {
+                id: questionId,
+                statement: question,
+            points: existingQuestion?.points || 1,
+                alternatives: [
+                    { 
+                    id: existingQuestion?.alternatives?.find(alt => alt.isCorrect)?.id || Date.now(), 
+                        text: correctAnswer, 
+                        isCorrect: true 
+                    },
+                    { 
+                    id: existingQuestion?.alternatives?.filter(alt => !alt.isCorrect)[0]?.id || Date.now() + 1, 
+                        text: alternativas.alternativa1, 
+                        isCorrect: false 
+                    },
+                    { 
+                    id: existingQuestion?.alternatives?.filter(alt => !alt.isCorrect)[1]?.id || Date.now() + 2, 
+                        text: alternativas.alternativa2, 
+                        isCorrect: false 
+                    },
+                    { 
+                    id: existingQuestion?.alternatives?.filter(alt => !alt.isCorrect)[2]?.id || Date.now() + 3, 
+                        text: alternativas.alternativa3, 
+                        isCorrect: false 
+                    }
+                ]
+            };
+            onQuestionChange(updatedQuestion);
+    }, [question, correctAnswer, alternativas, questionId, onQuestionChange, existingQuestion]);
+
+    // Atualizar quando os valores mudarem, com debounce
+    useEffect(() => {
+        const timeoutId = setTimeout(updateQuestion, 500);
+        return () => clearTimeout(timeoutId);
+    }, [updateQuestion]);
 
     const onSubmit = async (data) => {
         try {
             setIsSubmitting(true);
-            setSubmitError(null);
-            setSubmitSuccess(false);
-            setAlternativas({
-                alternativa1: '',
-                alternativa2: '',
-                alternativa3: ''
-            });
+
+            const token = Cookies.get('token');
+            if (!token) {
+                throw new Error('Token não encontrado');
+            }
 
             const payload = {
-                pergunta: data.pergunta,
-                respostaCorreta: data.respostaCorreta
+                question: data.question,
+                correct_answer: data.correct_answer
             };
 
-            const response = await fetch(`https://api-studdy.onrender.com/api/gerar-alternativas`, {
+            const response = await fetch(`http://localhost:3000/generate/generate-alternatives`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify(payload)
             });
@@ -77,18 +110,54 @@ function QuestionForm({ numeroQuestao, onAddQuestion, onDeleteQuestion }) {
             const result = await response.json();
             console.log(`Alternativas geradas:`, result);
 
-            if (result.alternativasErradas && result.alternativasErradas.length >= 3) {
-                setAlternativas({
-                    alternativa1: result.alternativasErradas[0].trim(),
-                    alternativa2: result.alternativasErradas[1].trim(),
-                    alternativa3: result.alternativasErradas[2].trim()
-                });
+            if (result.incorrectAnswers && result.incorrectAnswers.length >= 3) {
+                const novasAlternativas = {
+                    alternativa1: result.incorrectAnswers[0].trim(),
+                    alternativa2: result.incorrectAnswers[1].trim(),
+                    alternativa3: result.incorrectAnswers[2].trim()
+                };
+                setAlternativas(novasAlternativas);
+                
+                // Atualizar a questão com as novas alternativas
+                if (onQuestionChange) {
+                    const updatedQuestion = {
+                        id: questionId,
+                        statement: data.question,
+                        points: existingQuestion?.points || 1,
+                        alternatives: [
+                            { 
+                                id: existingQuestion?.alternatives?.find(alt => alt.isCorrect)?.id || Date.now(), 
+                                text: data.correct_answer, 
+                                isCorrect: true 
+                            },
+                            { 
+                                id: existingQuestion?.alternatives?.filter(alt => !alt.isCorrect)[0]?.id || Date.now() + 1, 
+                                text: novasAlternativas.alternativa1, 
+                                isCorrect: false 
+                            },
+                            { 
+                                id: existingQuestion?.alternatives?.filter(alt => !alt.isCorrect)[1]?.id || Date.now() + 2, 
+                                text: novasAlternativas.alternativa2, 
+                                isCorrect: false 
+                            },
+                            { 
+                                id: existingQuestion?.alternatives?.filter(alt => !alt.isCorrect)[2]?.id || Date.now() + 3, 
+                                text: novasAlternativas.alternativa3, 
+                                isCorrect: false 
+                            }
+                        ]
+                    };
+                    onQuestionChange(updatedQuestion);
+                }
+
+                toast.success('Alternativas geradas com sucesso!');
+            } else {
+                throw new Error('Não foi possível gerar as alternativas corretamente');
             }
 
-            setSubmitSuccess(true);
         } catch (error) {
             console.error(error);
-            setSubmitError(error.message || 'Erro ao gerar alternativas');
+            toast.error(error.message || 'Erro ao gerar alternativas');
         } finally {
             setIsSubmitting(false);
         }
@@ -98,24 +167,17 @@ function QuestionForm({ numeroQuestao, onAddQuestion, onDeleteQuestion }) {
         <div className="bg-white rounded-lg shadow-lg p-6">
             <h2 className="text-xl font-bold mb-4">Questão {numeroQuestao}</h2>
 
-            <Alert
-                submitSuccess={submitSuccess}
-                submitError={submitError}
-                successMessage="Alternativas geradas com sucesso!"
-                errorMessage="Erro ao gerar alternativas"
-            />
-
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <div className="space-y-4">
                     <FormField
                         control={form.control}
-                        name="pergunta"
+                        name="question"
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Pergunta</FormLabel>
                                 <FormControl>
                                     <Textarea
-                                        placeholder="Digite sua pergunta"
+                                        placeholder="Digite sua question"
                                         {...field}
                                         disabled={isSubmitting}
                                         className="min-h-[100px] resize-none focus-visible:border-[#1e40af] focus-visible:ring-[#1e40af] focus-visible:ring-[3px]"
@@ -128,10 +190,10 @@ function QuestionForm({ numeroQuestao, onAddQuestion, onDeleteQuestion }) {
 
                     <FormField
                         control={form.control}
-                        name="respostaCorreta"
+                        name="correct_answer"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel className="text-green-500">Resposta Correta</FormLabel>
+                                <FormLabel className="text-green-600">Resposta Correta</FormLabel>
                                 <FormControl>
                                     <Input
                                         placeholder="Digite a resposta correta"
@@ -145,57 +207,65 @@ function QuestionForm({ numeroQuestao, onAddQuestion, onDeleteQuestion }) {
                         )}
                     />
 
-                    {submitSuccess && (
-                        <div className="space-y-4">
-                            <FormItem>
-                                <FormLabel className="text-red-500">Alternativa Incorreta 1</FormLabel>
-                                <FormControl>
-                                    <Input
-                                        value={alternativas.alternativa1}
-                                        onChange={(e) => setAlternativas(prev => ({
+                    <div className="space-y-4">
+                        <FormItem>
+                            <FormLabel className="text-red-500">Alternativa Incorreta 1</FormLabel>
+                            <FormControl>
+                                <Input
+                                    placeholder="Clique em 'Gerar Alternativas' para preencher automaticamente"
+                                    value={alternativas.alternativa1}
+                                    onChange={(e) => {
+                                        setAlternativas(prev => ({
                                             ...prev,
                                             alternativa1: e.target.value
-                                        }))}
-                                        className="focus-visible:border-red-500 focus-visible:ring-red-500/50 focus-visible:ring-[3px]"
-                                    />
-                                </FormControl>
-                            </FormItem>
+                                        }));
+                                    }}
+                                    className="focus-visible:border-red-500 focus-visible:ring-red-500/50 focus-visible:ring-[3px]"
+                                />
+                            </FormControl>
+                        </FormItem>
 
-                            <FormItem>
-                                <FormLabel className="text-red-500">Alternativa Incorreta 2</FormLabel>
-                                <FormControl>
-                                    <Input
-                                        value={alternativas.alternativa2}
-                                        onChange={(e) => setAlternativas(prev => ({
+                        <FormItem>
+                            <FormLabel className="text-red-500">Alternativa Incorreta 2</FormLabel>
+                            <FormControl>
+                                <Input
+                                    placeholder="Clique em 'Gerar Alternativas' para preencher automaticamente"
+                                    value={alternativas.alternativa2}
+                                    onChange={(e) => {
+                                        setAlternativas(prev => ({
                                             ...prev,
                                             alternativa2: e.target.value
-                                        }))}
-                                        className="focus-visible:border-red-500 focus-visible:ring-red-500/50 focus-visible:ring-[3px]"
-                                    />
-                                </FormControl>
-                            </FormItem>
+                                        }));
+                                    }}
+                                    className="focus-visible:border-red-500 focus-visible:ring-red-500/50 focus-visible:ring-[3px]"
+                                />
+                            </FormControl>
+                        </FormItem>
 
-                            <FormItem>
-                                <FormLabel className="text-red-500">Alternativa Incorreta 3</FormLabel>
-                                <FormControl>
-                                    <Input
-                                        value={alternativas.alternativa3}
-                                        onChange={(e) => setAlternativas(prev => ({
+                        <FormItem>
+                            <FormLabel className="text-red-500">Alternativa Incorreta 3</FormLabel>
+                            <FormControl>
+                                <Input
+                                    placeholder="Clique em 'Gerar Alternativas' para preencher automaticamente"
+                                    value={alternativas.alternativa3}
+                                    onChange={(e) => {
+                                        setAlternativas(prev => ({
                                             ...prev,
                                             alternativa3: e.target.value
-                                        }))}
-                                        className="focus-visible:border-red-500 focus-visible:ring-red-500/50 focus-visible:ring-[3px]"
-                                    />
-                                </FormControl>
-                            </FormItem>
-                        </div>
-                    )}
+                                        }));
+                                    }}
+                                    className="focus-visible:border-red-500 focus-visible:ring-red-500/50 focus-visible:ring-[3px]"
+                                />
+                            </FormControl>
+                        </FormItem>
+                    </div>
 
                     <div className="flex gap-4">
                         <Button
-                            type="submit"
+                            type="button"
                             className="flex-1"
                             disabled={isSubmitting}
+                            onClick={form.handleSubmit(onSubmit)}
                         >
                             {isSubmitting ? 'Gerando...' : 'Gerar Alternativas'}
                         </Button>
@@ -209,17 +279,21 @@ function QuestionForm({ numeroQuestao, onAddQuestion, onDeleteQuestion }) {
                             Excluir Questão 
                         </Button>
                     </div>
-                </form>
+                </div>
             </Form>
             <Separator className="my-10" />
         </div>
     );
 }
 
-export default function Question({ numeroQuestao, onAddQuestion, onDeleteQuestion }) {
+export default function Question({ questionId, numeroQuestao, onAddQuestion, onDeleteQuestion, onAlternativesGenerated, existingQuestion, onQuestionChange }) {
     return <QuestionForm 
+        questionId={questionId}
         numeroQuestao={numeroQuestao} 
         onAddQuestion={onAddQuestion} 
         onDeleteQuestion={onDeleteQuestion}
+        onAlternativesGenerated={onAlternativesGenerated}
+        existingQuestion={existingQuestion}
+        onQuestionChange={onQuestionChange}
     />;
-}   
+}

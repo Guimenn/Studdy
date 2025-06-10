@@ -42,7 +42,7 @@ const PassRecoveryNewPass = () => {
         const validToken = localStorage.getItem('validRecoveryToken');
         if (!validToken) {
             // Se não houver token válido, redireciona para a página 404
-            router.push('/passrecovery/not-found');
+            router.push('/not-found');
         }
     }, [router]);
 
@@ -76,25 +76,56 @@ const PassRecoveryNewPass = () => {
             setLoading(true);
             setMsg('');
             
-            // Aqui você pode adicionar a lógica para atualizar a senha no backend
-            // Por exemplo:
-            // await updatePassword(data.newpassword);
+            const token = localStorage.getItem('validRecoveryToken');
+            const email = localStorage.getItem('recoveryEmail');
+
+            console.log('Dados sendo enviados:', {
+                email,
+                token: token ? 'Token presente' : 'Token ausente',
+                passwordLength: data.newpassword.length
+            });
+
+            const response = await fetch('http://localhost:3000/login/new-password', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: data.newpassword,
+                }),
+            });
+
+            const responseData = await response.json();
+            console.log('Resposta do servidor:', responseData);
+
+            if (!response.ok) {
+                throw new Error(responseData.message || 'Erro ao atualizar senha');
+            }
+
+            // Limpa os dados de recuperação
+            localStorage.removeItem('validRecoveryToken');
+            localStorage.removeItem('recoveryEmail');
             
             setMsg('Senha atualizada com sucesso!');
-            // Remove o token após atualizar a senha
-            localStorage.removeItem('validRecoveryToken');
+            
+            // Redireciona para a página de login após 2 segundos
             setTimeout(() => {
-                router.push('/login');
+                router.push('/pages/login');
             }, 2000);
+            
         } catch (error) {
-            setMsg('Erro ao atualizar a senha. Tente novamente.');
+            console.error('Erro detalhado:', error);
+            setMsg(error.message || 'Erro ao atualizar senha. Tente novamente.');
         } finally {
             setLoading(false);
         }
     };
 
+
     return (
-        <div className="min-h-screen background flex items-center justify-center p-4">
+        <div className="min-h-screen background w-screen flex items-center justify-center p-4">
             <div className="w-full max-w-md">
                 <div className="bg-white rounded-xl shadow-lg p-8 space-y-6">
                     <div className="flex flex-col items-center space-y-4">

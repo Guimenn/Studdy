@@ -13,43 +13,79 @@ import {
 import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
-
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { useUser } from "@/contexts/UserContext";
+import Cookies from 'js-cookie';
 
 const formSchema = z.object({
 	email: z.string().email('E-mail inválido'),
-	password: z.string().min(8, 'A senha deve ter pelo menos 8 caracteres'),
+	password: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres'),
 });
 
-
 export default function LoginPage() {
+	const router = useRouter();
+	const [isLoading, setIsLoading] = useState(false);
+	const { setUserRole } = useUser();
+
 	const form = useForm({
+		resolver: zodResolver(formSchema),
 		defaultValues: {
 			email: '',
 			password: '',
 		},
-		resolver: zodResolver(formSchema),
 	});
 
-	const onSubmit = (data) => {
-		console.log(data);
+	const onSubmit = async (data) => {
+		setIsLoading(true);
+
+		try {
+
+			console.log('Dados enviados:', data);
+			const response = await fetch('http://localhost:3000/login', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(data),
+			});
+
+			console.log('Dados recebidos:', response);
+	
+
+			if (!response.ok) {
+				throw new Error('Erro ao fazer login');
+			}
+
+			const responseData = await response.json();
+
+			if (responseData.user) {
+				const userRole = responseData.user.role;
+				Cookies.set('userRole', userRole);
+				Cookies.set('userId', responseData.user.id);
+				Cookies.set('token', responseData.token);
+				setUserRole(userRole);
+				toast.success('Login realizado com sucesso!');
+				router.push('/pages/painel');
+			} else {
+				toast.error('Credenciais inválidas');
+			}
+		} catch (error) {
+			console.error('Erro ao fazer login:', error);
+			toast.error('Erro ao fazer login. Tente novamente.');
+		} finally {
+			setIsLoading(false);
+		}
 	};
 
 	return (
-		<div className="bg-white min-w-screen h-screen flex items-center justify-center">
+		<div className="background min-w-screen h-screen flex items-center justify-center">
 			<div className="w-full h-full flex flex-row">
-
-				<div className="hidden w-[65	%] lg:flex rounded-lg items-center justify-center">
-					<img
-						className="w-full h-full object-cover"
-						src="/assets/students.webp"
-						alt="illustration"
-					/>
-				</div>
-
-				<div className="w-screen lg:w-[35%] h-full  flex items-center justify-center">
-					<div className="w-full max-w-md p-8 space-y-6 rounded-xl ">
+				<div className="w-screen lg:w-[100%] h-full flex items-center justify-center">
+					<div className="bg-white w-full max-w-md p-8 space-y-6 rounded-xl">
 						<Logo className="h-9 w-9 mx-auto" variant="icon" />
 						<h1 className="text-2xl font-bold text-gray-900 text-center">
 							Entrar no Studdy
@@ -76,6 +112,7 @@ export default function LoginPage() {
 													placeholder="seu@email.com"
 													{...field}
 													className="bg-white w-full"
+													disabled={isLoading}
 												/>
 											</FormControl>
 											<FormMessage />
@@ -94,29 +131,31 @@ export default function LoginPage() {
 													placeholder="********"
 													{...field}
 													className="bg-white w-full"
+													disabled={isLoading}
 												/>
 											</FormControl>
 											<FormMessage />
 										</FormItem>
 									)}
 								/>
-								<Button type="submit" className="w-full  hover:bg-blue-700 text-white font-medium py-2.5">
-									Continuar com E-mail
+								<Button 
+									type="submit" 
+									className="w-full hover:bg-blue-700 text-white font-medium py-2.5"
+									disabled={isLoading}
+								>
+									{isLoading ? 'Carregando...' : 'Continuar com E-mail'}
 								</Button>
 							</form>
 						</Form>
 
 						<div className="mt-2 text-center">
-							<Link href="/passrecovery" className="text-sm underline text-muted-foreground hover:text-gray-900 transition-colors">
+							<Link href="/pages/recovery/passrecovery" className="text-sm underline text-muted-foreground hover:text-gray-900 transition-colors">
 								Esqueceu sua senha?
 							</Link>
 						</div>
 					</div>
 				</div>
-
 			</div>
 		</div>
-
 	);
-};
-
+}

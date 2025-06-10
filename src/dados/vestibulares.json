@@ -1,0 +1,74 @@
+[
+    {
+        "title": "ENEM",
+        "description": "Exame Nacional do Ensino Médio",
+        "link": "https://www.gov.br/inep/pt-br/areas-de-atuacao/avaliacao-e-exames-educacionais/enem",
+        "icon": "BookOpen",
+        "color": "bg-blue-600",
+        "date": "Novembro 2024",
+        "type": "publico"
+    },
+    {
+        "title": "FUVEST",
+        "description": "Fundação Universitária para o Vestibular - USP",
+        "link": "https://www.fuvest.br/",
+        "icon": "BookOpen",
+        "color": "bg-red-600",
+        "date": "Dezembro 2024",
+        "type": "publico"
+    },
+    {
+        "title": "UNICAMP",
+        "description": "Universidade Estadual de Campinas",
+        "link": "https://www.comvest.unicamp.br/",
+        "icon": "BookOpen",
+        "color": "bg-yellow-600",
+        "date": "Janeiro 2025",
+        "type": "publico"
+    },
+    {
+        "title": "UNESP",
+        "description": "Universidade Estadual Paulista",
+        "link": "https://www.vunesp.com.br/",
+        "icon": "BookOpen",
+        "color": "bg-green-600",
+        "date": "Janeiro 2025",
+        "type": "publico"
+    },
+    {
+        "title": "UNIFESP",
+        "description": "Universidade Federal de São Paulo",
+        "link": "https://www.unifesp.br/",
+        "icon": "BookOpen",
+        "color": "bg-purple-600",
+        "date": "Fevereiro 2025",
+        "type": "publico"
+    },
+    {
+        "title": "PUC-SP",
+        "description": "Pontifícia Universidade Católica de São Paulo",
+        "link": "https://www.pucsp.br/",
+        "icon": "BookOpen",
+        "color": "bg-indigo-600",
+        "date": "Novembro 2024",
+        "type": "privado"
+    },
+    {
+        "title": "MACKENZIE",
+        "description": "Universidade Presbiteriana Mackenzie",
+        "link": "https://www.mackenzie.br/",
+        "icon": "BookOpen",
+        "color": "bg-orange-600",
+        "date": "Novembro 2024",
+        "type": "privado"
+    },
+    {
+        "title": "UNIP",
+        "description": "Universidade Paulista",
+        "link": "https://www.unip.br/",
+        "icon": "BookOpen",
+        "color": "bg-pink-600",
+        "date": "Dezembro 2024",
+        "type": "privado"
+    }
+]

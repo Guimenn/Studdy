@@ -1,5 +1,13 @@
-import { Button } from '@/components/ui/button';
+import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
 
 export default function Home() {
-	return <h1>Home</h1>;
+  const cookieStore = cookies();
+  const token = cookieStore.get('token')?.value;
+
+  if (!token) {
+    redirect('/pages/login');
+  }
+
+  redirect('/pages/painel');
 }

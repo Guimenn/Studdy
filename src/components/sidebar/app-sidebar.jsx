@@ -1,16 +1,12 @@
 "use client"
 
-import * as React from "react"
+import { useEffect, useState } from "react"
 import {
-  AudioWaveform,
   BookOpen,
   Bot,
-  Command,
-  Frame,
-  GalleryVerticalEnd,
+  Users,
   Map,
   PieChart,
-  Settings2,
   SquareTerminal,
 } from "lucide-react"
 
@@ -18,18 +14,16 @@ import { NavMain } from "@/components/sidebar/nav-main"
 import { NavProjects } from "@/components/sidebar/nav-projects"
 import { NavUser } from "@/components/sidebar/nav-user"
 import { NavMainDropdown } from "@/components/sidebar/nav-main"
-import { TeamSwitcher } from "@/components/sidebar/team-switcher"
-import { useUser } from "@/contexts/UserContext"
+import { useSidebar } from "@/components/ui/sidebar"
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
-  SidebarTrigger,
-  useSidebar,
 } from "@/components/ui/sidebar"
 import Logo from "@/components/ui/logo"
+import Cookies from "js-cookie"
 
 // Dados do aluno
 const dataAluno = {
@@ -38,45 +32,30 @@ const dataAluno = {
     email: "aluno@example.com",
     avatar: "/avatars/aluno.jpg",
   },
-
   navMain: [
-    {
-      title: "Painel",
-      url: "/pages/painel",
-      icon: SquareTerminal,
-      isActive: true,
-    },
-    {
-      title: "Simulados",
-      url: "/pages/simulados",
-      icon: Bot,
-    },
-    {
-      title: "Estatísticas  ",
-      url: "/pages/estatisticas",
-      icon: BookOpen,
-    }
+    { title: "Painel", url: "/pages/painel", icon: SquareTerminal, isActive: true },
+    { title: "Simulados", url: "/pages/simulados", icon: Bot },
+    { title: "Estatísticas", url: "/pages/estatisticas", icon: BookOpen },
   ],
   navMainDropdown: [
     {
       title: "Biblioteca",
-      
       url: "/pages/material",
       icon: BookOpen,
       itemsDropdown: [
-        { title: "Materiais", url: "/pages/material" },
+      
         { title: "Videoaulas", url: "/pages/material/videoaulas" },
-        { title: "Apostilas", url: "/pages/material/apostilas" },
+        
         { title: "Resumos", url: "/pages/material/resumos" },
-        { title: "Exercícios", url: "/pages/material/exercicios" }
       ],
-    }
+    },
   ],
   projects: [
     { name: "Concursos", url: "/pages/concursos", icon: PieChart },
     { name: "Vestibulares", url: "/pages/vestibulares", icon: Map },
+    { name: "Minha Turma", url: "/pages/turmas/student", icon: Users },
   ],
-};
+}
 
 // Dados do professor
 const dataProfessor = {
@@ -85,35 +64,29 @@ const dataProfessor = {
     email: "prof@example.com",
     avatar: "/avatars/prof.jpg",
   },
+  navMain: [
+    { title: "Painel", url: "/pages/painel", icon: SquareTerminal, isActive: true },
+    { title: "Simulados", url: "/pages/turmas/teacher", icon: Bot },
+  ],
   navMainDropdown: [
     {
-      title: "Conteúdo Didático",
-      url: "#",
+      title: "Biblioteca",
+      url: "/pages/material",
       icon: BookOpen,
       itemsDropdown: [
-        { title: "Minhas Aulas", url: "#" },
-        { title: "Materiais", url: "#" }
+        { title: "Minhas Videoaulas", url: "/pages/material/videoaulas/teacher" },
+        { title: "Criar Videoaulas", url: "/pages/material/videoaulas/criar-videoaulas" },
+        { title: "Meus Resumos", url: "/pages/material/resumos/teacher" },
+        { title: "Criar Resumos", url: "/pages/material/resumos/criar-resumos" },
       ],
-    }
-  ],
-  navMain: [
-    {
-      title: "Painel",
-      url: "/pages/painel",
-      icon: SquareTerminal,
-      isActive: true,
-    },
-    {
-      title: "Atividades",
-      url: "#",
-      icon: Bot,  
     },
   ],
   projects: [
-    { name: "Turma 1", url: "#", icon: Frame },
-    { name: "Turma 2", url: "#", icon: PieChart },
+    { name: "Concursos", url: "/pages/concursos", icon: PieChart },
+    { name: "Vestibulares", url: "/pages/vestibulares", icon: Map },
+    { name: "Minhas Turmas", url: "/pages/turmas/teacher", icon: Users },
   ],
-};
+}
 
 // Dados do admin
 const dataAdmin = {
@@ -122,98 +95,85 @@ const dataAdmin = {
     email: "admin@example.com",
     avatar: "/avatars/admin.jpg",
   },
+  navMain: [
+    { title: "Painel", url: "/pages/painel", icon: SquareTerminal, isActive: true },
+    { title: "Administração", url: "/pages/administracao", icon: BookOpen },
+    { title: "Cadastro", url: "/pages/cadastro", icon: Bot },
+  ],
   navMainDropdown: [
     {
-      title: "Gerenciamento",
-      url: "#",
+      title: "Biblioteca",
+      url: "/pages/material",
       icon: BookOpen,
       itemsDropdown: [
-        { title: "Usuários", url: "#" },
-        { title: "Permissões", url: "#" },
-        { title: "Configurações", url: "#" }
+        { title: "Videoaulas", url: "/pages/material/videoaulas" },
+        { title: "Resumos", url: "/pages/material/resumos" },
       ],
-    }
-  ],
-  navMain: [
-    {
-      title: "Painel",
-      url: "/pages/painel",
-      icon: SquareTerminal,
-      isActive: true,
-    },
-    {
-      title: "Conteúdo",
-      url: "#",
-      icon: Bot,
-    },
-    {
-      title: "Administração",
-      url: "#",
-      icon: BookOpen,
     },
   ],
   projects: [
-    { name: "Sistema Principal", url: "#", icon: Frame },
-    { name: "Ambiente de Teste", url: "#", icon: PieChart },
-    { name: "Produção", url: "#", icon: Map },
+    { name: "Concursos", url: "/pages/concursos", icon: PieChart },
+    { name: "Vestibulares", url: "/pages/vestibulares", icon: Map },
+    { name: "Minhas Classes", url: "/pages/turmas", icon: Users },
   ],
-};
+}
 
+// Componentes de navegação
 function AlunoNav() {
   return (
     <>
-      <NavMain items={dataAluno.navMain} />
-      <NavMainDropdown itemsDropdown={dataAluno.navMainDropdown} />
-      <NavProjects projects={dataAluno.projects} />
+      <NavMain items={dataAluno.navMain} role="student" />
+      <NavMainDropdown itemsDropdown={dataAluno.navMainDropdown} role="student" />
+      <NavProjects projects={dataAluno.projects} role="student" />
     </>
-  );
+  )
 }
 
 function ProfessorNav() {
   return (
     <>
-      <NavMain items={dataProfessor.navMain} />
-      <NavMainDropdown itemsDropdown={dataProfessor.navMainDropdown} />
-      <NavProjects projects={dataProfessor.projects} />
+      <NavMain items={dataProfessor.navMain} role="teacher" />
+      <NavMainDropdown itemsDropdown={dataProfessor.navMainDropdown} role="teacher" />
+      <NavProjects projects={dataProfessor.projects} role="teacher" />
     </>
-  );
+  )
 }
 
 function AdminNav() {
   return (
     <>
-      <NavMain items={dataAdmin.navMain} />
-      <NavMainDropdown itemsDropdown={dataAdmin.navMainDropdown} />
-      <NavProjects projects={dataAdmin.projects} />
+      <NavMain items={dataAdmin.navMain} role="admin" />
+      <NavMainDropdown itemsDropdown={dataAdmin.navMainDropdown} role="admin" />
+      <NavProjects projects={dataAdmin.projects} role="admin" />
     </>
-  );
+  )
 }
+export function AppSidebar({ children, ...props }) {
+  const { state, toggleSidebar } = useSidebar()
+  const [userRole, setUserRole] = useState(null)
 
-export function AppSidebar({
-  children,
-  ...props
-}) {
-  const { state, toggleSidebar } = useSidebar();
-  const { userRole, setUserRole } = useUser();
+  useEffect(() => {
+    const role = Cookies.get("userRole")
+    console.log("🚀 Papel detectado via cookie:", role) // <== debug
+    if (role) {
+      setUserRole(role.toLowerCase())
+    }
+  }, [])
 
-  let NavComponent;
-  let userData;
+  if (!userRole) return null // ou um loader visual
 
-  switch (userRole) {
-    case "admin":
-      NavComponent = <AdminNav />;
-      userData = dataAdmin.user;
-      break;
-    case "professor":
-      NavComponent = <ProfessorNav />;
-      userData = dataProfessor.user;
-      break;
-    case "aluno":
-    default:
-      NavComponent = <AlunoNav />;
-      userData = dataAluno.user;
-      break;
-  }
+  const { user, NavComponent } = (() => {
+    switch (userRole) {
+      case "admin":
+        return { user: dataAdmin.user, NavComponent: <AdminNav /> }
+      case "teacher":
+        return { user: dataProfessor.user, NavComponent: <ProfessorNav /> }
+      case "student":
+        return { user: dataAluno.user, NavComponent: <AlunoNav /> }
+      default:
+        return { user: dataAluno.user, NavComponent: <AlunoNav /> }
+    }
+  })()
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -227,39 +187,18 @@ export function AppSidebar({
             <Logo className="h-9 w-9 cursor-pointer transition-transform hover:scale-105" variant="icon" />
           </button>
           {state !== "collapsed" && (
-            <>
-              <img src="/assets/logo_text.svg" alt="logo" className="h-10 w-25" />
-              <div className="flex gap-2 mt-2">
-                <button
-                  className={`px-2 py-1 rounded ${userRole === "aluno" ? "bg-[#133D86] text-white" : "bg-gray-200"}`}
-                  onClick={() => setUserRole("aluno")}
-                >
-                  Aluno
-                </button>
-                <button
-                  className={`px-2 py-1 rounded ${userRole === "professor" ? "bg-[#133D86] text-white" : "bg-gray-200"}`}
-                  onClick={() => setUserRole("professor")}
-                >
-                  Professor
-                </button>
-                <button
-                  className={`px-2 py-1 rounded ${userRole === "admin" ? "bg-[#133D86] text-white" : "bg-gray-200"}`}
-                  onClick={() => setUserRole("admin")}
-                >
-                  Admin
-                </button>
-              </div>
-            </>
+            <img src="/assets/logo_text.svg" alt="logo" className="h-10 w-25" />
           )}
         </div>
       </SidebarHeader>
-      <SidebarContent>
-        {NavComponent}
-      </SidebarContent>
+
+      <SidebarContent>{NavComponent}</SidebarContent>
+
       <SidebarFooter>
-        <NavUser user={userData} />
+        <NavUser user={user} />
       </SidebarFooter>
+
       <SidebarRail />
     </Sidebar>
-  );
+  )
 }

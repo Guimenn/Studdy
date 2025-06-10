@@ -1,417 +1,486 @@
 'use client';
 
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import {
     Form,
-    FormControl,
-    FormField,
-    FormItem,
     FormLabel,
-    FormMessage,
 } from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import Logo from '@/components/ui/logo';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import Alert from "@/components/ui/alerts";
+import { BaseFormField, SelectFormField } from "@/components/ui/formfield";
+import { useUser } from "@/contexts/UserContext";
+import { useRouter } from "next/navigation";
+import { PageLoader } from "@/components/ui/loader";
+import Cookies from 'js-cookie';
+
+const API_ENDPOINTS = {
+    student: "http://localhost:3000/admin/students",
+    teacher: "http://localhost:3000/admin/teachers",
+    classes: "http://localhost:3000/admin/classes",
+    subjects: "http://localhost:3000/admin/subjects"
+};
+
+const SHIFT_OPTIONS = [
+    { value: "Morning", label: "Manhã" },
+    { value: "Afternoon", label: "Tarde" },
+    { value: "Evening", label: "Noite" }
+];
+
+const shiftTurma = (shift) => {
+    const shiftOption = SHIFT_OPTIONS.find(option => option.value === shift);
+    return shiftOption ? shiftOption.label : shift;
+};
+
+const formatDate = (dateString) => dateString ? new Date(dateString).toLocaleDateString('pt-BR') : null;
 
 const formSchema = z.object({
-    tipo: z.string().min(1, "Selecione um tipo de usuário"),
-    nome: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
-    email: z.string().email("Email inválido"),
-    senha: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
-    matricula: z.string().optional(),
-    curso: z.string().optional(),
-    formacao: z.string().optional(),
-    area: z.string().optional(),
+    tipo: z.enum(["student", "teacher", "subjects"], {
+        required_error: "Selecione um tipo",
+    }),
+    name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres").max(100, "Nome deve ter no máximo 100 caracteres"),
+    email: z.string().email("Email inválido").optional().or(z.literal('')),
+    password: z.string()
+        .min(6, "Senha deve ter pelo menos 6 caracteres")
+        .regex(/[A-Z]/, "Senha deve conter pelo menos uma letra maiúscula")
+        .regex(/[a-z]/, "Senha deve conter pelo menos uma letra minúscula")
+        .regex(/[0-9]/, "Senha deve conter pelo menos um número")
+        .optional()
+        .or(z.literal('')),
+    cpf: z.string()
+        .min(11, "CPF deve ter 11 dígitos")
+        .max(14, "CPF deve ter no máximo 14 dígitos")
+        .regex(/^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$/, "CPF inválido")
+        .optional()
+        .or(z.literal('')),
+    birth_date: z.string()
+        .regex(/^\d{4}-\d{2}-\d{2}$/, "Data inválida")
+        .optional()
+        .or(z.literal('')),
+    class: z.string().min(1, "Selecione uma turma").optional().or(z.literal('')), 
+    curso: z.string().max(100, "Curso deve ter no máximo 100 caracteres").optional().or(z.literal('')),
+    subject: z.string().optional().or(z.literal('')),
+    subject2: z.string().optional().or(z.literal('')),
+}).refine((data) => {
+    // Validações específicas por tipo
+    if (data.tipo === 'teacher' || data.tipo === 'student') {
+        return data.email && data.password && data.cpf && data.birth_date;
+    }
+    return true;
+}, {
+    message: "Preencha todos os campos obrigatórios",
+    path: ["tipo"]
 });
 
+// Formulários específicos
+const SubjectForm = ({ control }) => (
+    <BaseFormField
+        control={control}
+        name="name"
+        label="Nome da Disciplina"
+        placeholder="Nome da Disciplina"
+    />
+);
+
+const ProfessorForm = ({ control, subjects, isLoading, error }) => (
+    <>
+        <BaseFormField
+            control={control}
+            name="name"
+            label="Nome"
+            placeholder="Nome"
+        />
+        <BaseFormField
+            control={control}
+            name="email"
+            label="Email"
+            type="email"
+            placeholder="Email"
+        />
+        <BaseFormField
+            control={control}
+            name="password"
+            label="Senha"
+            type="password"
+            placeholder="Senha"
+        />
+        <BaseFormField
+            control={control}
+            name="cpf"
+            label="CPF"
+            placeholder="CPF"
+        />
+        <BaseFormField
+            control={control}
+            name="birth_date"
+            label="Data de Nascimento"
+            type="date"
+            placeholder="Data de Nascimento"
+        />
+        <SelectFormField
+            control={control}
+            name="subject"
+            label="Disciplina 1"
+            options={subjects.map((subject, index) => ({
+                value: (index + 1).toString(),
+                label: subject.charAt(0).toUpperCase() + subject.slice(1)
+            }))}
+            placeholder="Selecione uma disciplina"
+            disabled={isLoading}
+        />
+        <SelectFormField
+            control={control}
+            name="subject2"
+            label="Disciplina 2"
+            options={subjects.map((subject, index) => ({
+                value: (index + 1).toString(),
+                label: subject.charAt(0).toUpperCase() + subject.slice(1)
+            }))
+            }
+            placeholder="Selecione uma disciplina"
+            disabled={isLoading}
+        />
+        {error && <p className="text-red-500 text-sm">{error}</p>}
+        {isLoading && <p className="text-sm text-muted-foreground">Carregando disciplinas...</p>}
+    </>
+);
+
+const AlunoForm = ({ control, classes, isLoading, error }) => (
+    <>
+        <BaseFormField
+            control={control}
+            name="name"
+            label="Nome"
+            placeholder="Nome"
+        />
+        <BaseFormField
+            control={control}
+            name="email"
+            label="Email"
+            type="email"
+            placeholder="Email"
+        />
+        <BaseFormField
+            control={control}
+            name="password"
+            label="Senha"
+            type="password"
+            placeholder="Senha"
+        />
+        <BaseFormField
+            control={control}
+            name="cpf"
+            label="CPF"
+            placeholder="CPF"
+        />
+        <BaseFormField
+            control={control}
+            name="birth_date"
+            label="Data de Nascimento"
+            type="date"
+            placeholder="Data de Nascimento"
+        />
+
+        <div className="space-y-2">
+            <FormLabel>Turma</FormLabel>
+            {isLoading ? (
+                <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+                    <span>Carregando turmas...</span>
+                </div>
+            ) : error ? (
+                <div className="text-sm text-red-500">
+                    {error}
+                </div>
+            ) : classes.length === 0 ? (
+                <div className="text-sm text-muted-foreground">
+                    Nenhuma turma disponível
+                </div>
+            ) : (
+                <SelectFormField
+                    control={control}
+                    name="class"
+                    label=""
+                    options={classes.map((turma) => ({
+                        value: turma.id.toString(),
+                        label: `${turma.name} - ${shiftTurma(turma.shift)} (${turma.course})`
+                    }))}
+                    placeholder="Selecione uma turma"
+                />
+            )}
+        </div>
+    </>
+);
+
 function CadastroForm() {
-    const [areas, setAreas] = useState([]);
+    const { userRole } = useUser();
+    const router = useRouter();
+    const [state, setState] = useState({
+        subjects: [],
+        classes: [],
+        isLoading: false,
+        isLoadingClasses: false,
+        error: null,
+        errorClasses: null,
+        isSubmitting: false,
+        submitError: null,
+        submitSuccess: false
+    });
+    const [isAuthorized, setIsAuthorized] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [submitError, setSubmitError] = useState(null);
-    const [submitSuccess, setSubmitSuccess] = useState(false);
-    const [isGeneratingMatricula, setIsGeneratingMatricula] = useState(false);
 
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            tipo: "selecione",
-            nome: "",
+            tipo: "",
+            name: "",
             email: "",
-            senha: "",
-            matricula: "",
-            curso: "",
-            formacao: "",
-            area: "",
+            password: "",
+            cpf: "",
+            birth_date: "",
+            subject: "",
+            subject2: "",
+            class: "",
         },
     });
 
     const tipo = form.watch("tipo");
 
-    useEffect(() => {
-        const fetchAreas = async () => {
-            try {
-                setIsLoading(true);
-                setError(null);
-                const response = await fetch('https://api-studdy.onrender.com/api/disciplinas', {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                    },
-                    mode: 'cors',
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Erro ao buscar áreas: ${response.status}`);
-                }
-
-                const data = await response.json();
-                if (!Array.isArray(data)) {
-                    throw new Error('Formato de resposta inválido');
-                }
-
-                const areasList = data.map(item => item.nome || item.name || item);
-                setAreas(areasList);
-            } catch (error) {
-                console.error('Erro ao buscar áreas:', error);
-                setError(error.message || 'Não foi possível carregar as áreas');
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchAreas();
-    }, []);
-
-    const gerarMatriculaUnica = async () => {
+    const fetchData = async (endpoint, setter, loadingKey) => {
+        const token = Cookies.get('token');
         try {
-            setIsGeneratingMatricula(true);
-            let matriculaUnica = false;
-            let novaMatricula = "";
+            setState(prev => ({ ...prev, [loadingKey]: true }));
+            const response = await fetch(endpoint, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                 }
+            });
 
-            while (!matriculaUnica) {
-                const numeroAleatorio = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-                novaMatricula = "2425" + numeroAleatorio;
+            if (!response.ok) throw new Error(`Erro ao buscar dados de ${endpoint}`);
 
-                const response = await fetch(`https://api-studdy.onrender.com/api/alunos/matricula/${novaMatricula}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                    },
-                });
-
-                if (response.status === 404) {
-                    matriculaUnica = true;
-                } else if (!response.ok) {
-                    throw new Error('Erro ao verificar matrícula');
-                }
-            }
-
-            form.setValue("matricula", novaMatricula);
+            const data = await response.json();
+            setter(data);
         } catch (error) {
-            console.error('Erro ao gerar matrícula:', error);
-            setSubmitError('Erro ao gerar matrícula. Tente novamente.');
+            console.error(`Erro ao buscar dados:`, error);
+            setState(prev => ({
+                ...prev,
+                error: error.message,
+                [loadingKey]: false
+            }));
         } finally {
-            setIsGeneratingMatricula(false);
+            setState(prev => ({ ...prev, [loadingKey]: false }));
         }
     };
 
-    const onSubmit = async (data) => {
-        try {
-            setIsSubmitting(true);
-            setSubmitError(null);
-            setSubmitSuccess(false);
+    // Carregar dados iniciais apenas uma vez
+    useEffect(() => {
+        const loadInitialData = async () => {
+            await fetchData(
+                API_ENDPOINTS.classes,
+                data => setState(prev => ({ ...prev, classes: data })),
+                'isLoadingClasses'
+            );
+            await fetchData(
+                API_ENDPOINTS.subjects,
+                data => setState(prev => ({ ...prev, subjects: data.map(item => item.name) })),
+                'isLoading'
+            );
+        };
 
-            let payload;
-            if (data.tipo === "professores") {
-                payload = {
-                    nome: data.nome,
-                    email: data.email,
-                    senha: data.senha,
-                    formacao: data.formacao,
-                    area_atuacao: data.area
-                };
+        loadInitialData();
+    }, []);
+
+    // Recarregar turmas apenas quando o tipo mudar para students
+    useEffect(() => {
+        if (tipo === 'student' && state.classes.length === 0) {
+            fetchData(
+                API_ENDPOINTS.classes,
+                data => setState(prev => ({ ...prev, classes: data })),
+                'isLoadingClasses'
+            );
+        }
+    }, [tipo]);
+
+    useEffect(() => {
+        // Simulate loading user role
+        const timer = setTimeout(() => {
+            if (userRole !== "admin") {
+                router.push("/not-found");
             } else {
-                payload = {
-                    nome: data.nome,
-                    email: data.email,
-                    senha: data.senha,
-                    matricula: data.matricula,
-                    curso: data.curso
-                };
+                setIsAuthorized(true);
             }
+            setIsLoading(false);
+        }, 500);
 
-            const response = await fetch(`https://api-studdy.onrender.com/api/${data.tipo}`, {
+        return () => clearTimeout(timer);
+    }, [userRole, router]);
+
+    if (isLoading) {
+        return <PageLoader />;
+    }
+
+    if (!isAuthorized) {
+        return null;
+    }
+
+    const formatPayload = (data, tipo) => {
+        const payloads = {
+            subjects: { name: data.name.trim() },
+            teacher: {
+                user: {
+                    name: data.name,
+                    email: data.email,
+                    password: data.password,
+                    birth_date: data.birth_date.split('-').reverse().join('/'),
+                    cpf: data.cpf,
+                    role: "Teacher"
+                },
+                teacher: {
+                    subjects: [
+                        { id: parseInt(data.subject) },
+                        ...(data.subject2 ? [{ id: parseInt(data.subject2) }] : [])
+                    ]
+                }
+            },
+            student: {
+                user: {
+                    name: data.name,
+                    email: data.email,
+                    password: data.password,
+                    birth_date: data.birth_date.split('-').reverse().join('/'),
+                    cpf: data.cpf,
+                    role: "Student"
+                },
+                student: {
+                    class_id: parseInt(data.class)
+                }
+            }
+        };
+        return payloads[tipo];
+    };
+
+    const onSubmit = async (data) => {
+        const token = Cookies.get('token');
+        try {
+            setState(prev => ({ ...prev, isSubmitting: true, submitError: null, submitSuccess: false }));
+
+            const endpoint = API_ENDPOINTS[data.tipo];
+            if (!endpoint) throw new Error("Tipo de cadastro inválido");
+
+            const cleanData = formatPayload(data, data.tipo);
+            if (!cleanData) throw new Error("Formato de dados inválido para o tipo selecionado");
+            console.log('Dados enviados:', cleanData);
+            const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify(payload)
+                mode: 'cors',
+                credentials: 'include',
+                body: JSON.stringify(cleanData)
             });
 
+            const responseText = await response.text();
+            const responseData = responseText ? JSON.parse(responseText) : {};
+
             if (!response.ok) {
-                const errorData = await response.json();
-                const errorMessage = errorData.message || errorData.error || 'Erro ao realizar cadastro';
-                throw new Error(errorMessage);
+                throw new Error(responseData.message || `Erro ao cadastrar: ${response.status}`);
             }
 
-            const result = await response.json();
-            console.log(`${data.tipo === "professores" ? "Professor" : "Aluno"} cadastrado:`, result);
-
-            setSubmitSuccess(true);
+            setState(prev => ({ ...prev, submitSuccess: true }));
             form.reset();
         } catch (error) {
-            console.error('Erro ao cadastrar:', error);
-            setSubmitError(error.message || 'Erro ao realizar cadastro');
+            console.error("Erro no cadastro:", error);
+            setState(prev => ({ ...prev, submitError: error.message }));
         } finally {
-            setIsSubmitting(false);
+            setState(prev => ({ ...prev, isSubmitting: false }));
+        }
+    };
+
+    const renderFormByType = () => {
+        switch (tipo) {
+            case "subjects":
+                return <SubjectForm control={form.control} />;
+            case "teacher":
+                return <ProfessorForm
+                    control={form.control}
+                    subjects={state.subjects}
+                    classes={state.classes}
+                    isLoading={state.isLoading}
+                    error={state.error}
+                />;
+            case "student":
+                return <AlunoForm
+                    control={form.control}
+                    classes={state.classes}
+                    isLoading={state.isLoadingClasses}
+                    error={state.errorClasses}
+                />;
+            default:
+                return null;
         }
     };
 
     return (
-        <div className="bg-slate-100 min-h-screen flex items-center justify-center p-4">
-            <div className="w-full max-w-2xl bg-white rounded-lg shadow-lg p-6">
-                <div className="flex flex-col items-center mb-6">
-                    <Logo className="h-9 w-9" variant="icon" />
-                    <h1 className="mt-4 text-2xl font-bold tracking-tight">Cadastro</h1>
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#e6eefc] via-[#f8fafc] to-[#c3dafe] p-4 animate-fade-in">
+            <div className="w-full max-w-2xl bg-white rounded-2xl shadow-2xl p-8 border border-blue-100">
+                <div className="flex flex-col items-center mb-8">
+                    <Logo className="h-12 w-12" variant="icon" />
+                    <h1 className="mt-4 text-3xl font-bold tracking-tight text-[#133D86]">Cadastro</h1>
                 </div>
 
-                <Alert submitSuccess={submitSuccess} submitError={submitError} />
+                {state.submitSuccess && (
+                    <div className="mb-6 p-4 bg-green-50 text-green-700 rounded-lg flex flex-row gap-3 items-center border border-green-200 animate-fade-in">
+                        <svg className="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                        Cadastro realizado com sucesso!
+                    </div>
+                )}
+
+                {state.submitError && (
+                    <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-lg flex flex-row gap-3 items-center border border-red-200 animate-fade-in">
+                        <svg className="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                        {state.submitError}
+                    </div>
+                )}
 
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                        <FormField
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                        <SelectFormField
                             control={form.control}
                             name="tipo"
-                            render={({ field }) => (
-                                <FormItem className="mb-6">
-                                    <FormLabel>Tipo de Usuário</FormLabel>
-                                    <Select
-                                        onValueChange={field.onChange}
-                                        defaultValue={field.value}
-                                        disabled={isSubmitting}
-                                    >
-                                        <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Selecione o tipo de usuário" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            <SelectItem value="selecione">Selecione</SelectItem>
-                                            <SelectItem value="alunos">Alunos</SelectItem>
-                                            <SelectItem value="professores">Professores</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
+                            options={[
+                                { value: "student", label: "Alunos" },
+                                { value: "teacher", label: "Professores" },
+                                { value: "subjects", label: "Disciplinas" }
+                            ]}
+                            placeholder="Selecione o tipo de cadastro"
+                            disabled={state.isSubmitting}
                         />
 
-                        {tipo && tipo !== "selecione" && (
-                            <>
-                                {tipo === "alunos" && (
-                                    <>
-                                        <FormField
-                                            control={form.control}
-                                            name="nome"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Nome</FormLabel>
-                                                    <FormControl>
-                                                        <Input placeholder="Nome" {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-
-                                        <FormField
-                                            control={form.control}
-                                            name="email"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Email</FormLabel>
-                                                    <FormControl>
-                                                        <Input type="email" placeholder="Email" {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-
-                                        <FormField
-                                            control={form.control}
-                                            name="senha"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Senha</FormLabel>
-                                                    <FormControl>
-                                                        <Input type="password" placeholder="Senha" {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-
-                                        <FormField
-                                            control={form.control}
-                                            name="matricula"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Matrícula</FormLabel>
-                                                    <FormControl>
-                                                        <Input maxLength={8} placeholder="Matrícula" {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <Button 
-                                            className="w-full" 
-                                            onClick={gerarMatriculaUnica}
-                                            disabled={isGeneratingMatricula}
-                                        >
-                                            {isGeneratingMatricula ? 'Gerando...' : 'Gerar Número de Matrícula'}
-                                        </Button>
-
-                                        <FormField
-                                            control={form.control}
-                                            name="curso"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Curso</FormLabel>
-                                                    <FormControl>
-                                                        <Input placeholder="Curso" {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </>
-                                )}
-
-                                {tipo === "professores" && (
-                                    <>
-                                        <FormField
-                                            control={form.control}
-                                            name="nome"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Nome</FormLabel>
-                                                    <FormControl>
-                                                        <Input placeholder="Nome" {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-
-                                        <FormField
-                                            control={form.control}
-                                            name="email"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Email</FormLabel>
-                                                    <FormControl>
-                                                        <Input type="email" placeholder="Email" {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-
-                                        <FormField
-                                            control={form.control}
-                                            name="senha"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Senha</FormLabel>
-                                                    <FormControl>
-                                                        <Input type="password" placeholder="Senha" {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-
-                                        <FormField
-                                            control={form.control}
-                                            name="formacao"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Formação</FormLabel>
-                                                    <FormControl>
-                                                        <Input placeholder="Formação" {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-
-                                        <FormField
-                                            control={form.control}
-                                            name="area"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Área</FormLabel>
-                                                    <Select
-                                                        onValueChange={field.onChange}
-                                                        defaultValue={field.value}
-                                                        disabled={isLoading}
-                                                    >
-                                                        <FormControl>
-                                                            <SelectTrigger>
-                                                                <SelectValue placeholder="Selecione uma área" />
-                                                            </SelectTrigger>
-                                                        </FormControl>
-                                                        <SelectContent>
-                                                            {areas.map((area, index) => (
-                                                                <SelectItem key={`area-${index}`} value={area}>
-                                                                    {area}
-                                                                </SelectItem>
-                                                            ))}
-                                                        </SelectContent>
-                                                    </Select>
-                                                    {error && <p className="text-red-500 text-sm">{error}</p>}
-                                                    {isLoading && <p className="text-sm text-muted-foreground">Carregando áreas...</p>}
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </>
-                                )}
-
-                                <Button
-                                    type="submit"
-                                    className="w-full mt-6"
-                                    disabled={isSubmitting}
-                                >
-                                    {isSubmitting ? 'Cadastrando...' : 'Cadastrar'}
-                                </Button>
-                            </>
+                        {tipo && (
+                            <div className="space-y-6">
+                                {renderFormByType()}
+                            </div>
                         )}
+
+                        <Button
+                            type="submit"
+                            className="w-full mt-8 h-12 text-lg bg-[#133D86] hover:bg-[#0e2a5c] transition-all duration-300 rounded-xl shadow-md font-semibold"
+                            disabled={state.isSubmitting || !tipo}
+                        >
+                            {state.isSubmitting ? 'Cadastrando...' : 'Cadastrar'}
+                        </Button>
                     </form>
                 </Form>
             </div>
         </div>
     );
 }
-
 export default function Cadastro() {
     return <CadastroForm />;
 }

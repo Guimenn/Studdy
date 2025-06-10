@@ -1,6 +1,7 @@
 "use client"
 
 import { Folder, Forward, MoreHorizontal, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 import {
   DropdownMenu,
@@ -20,19 +21,42 @@ import {
 } from "@/components/ui/sidebar"
 
 export function NavProjects({
-  projects
+  projects,
+  role
 }) {
   const { isMobile } = useSidebar()
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  const getLabel = () => {
+    switch (role) {
+      case 'admin':
+        return 'Gerenciar'
+      case 'teacher':
+        return 'Turmas'
+      case 'student':
+        return 'Simulados'
+      default:
+        return 'Projetos'
+    }
+  }
+
+  if (!isMounted) {
+    return null
+  }
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Simulados</SidebarGroupLabel>
+      <SidebarGroupLabel>{getLabel()}</SidebarGroupLabel>
       <SidebarMenu>
         {projects.map((item) => (
           <SidebarMenuItem key={item.name}>
             <SidebarMenuButton asChild>
               <a href={item.url}>
-                <item.icon  />
+                <item.icon />
                 <span>{item.name}</span>
               </a>
             </SidebarMenuButton>
@@ -40,7 +64,7 @@ export function NavProjects({
               <DropdownMenuTrigger asChild>
                 <SidebarMenuAction showOnHover>
                   <MoreHorizontal />
-                  <span className="sr-only">More</span>
+                  <span className="sr-only">Mais opções</span>
                 </SidebarMenuAction>
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -64,12 +88,6 @@ export function NavProjects({
             </DropdownMenu>
           </SidebarMenuItem>
         ))}
-        <SidebarMenuItem>
-          <SidebarMenuButton className="text-sidebar-foreground/70">
-            <MoreHorizontal className="text-sidebar-foreground/70" />
-            <span>More</span>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
       </SidebarMenu>
     </SidebarGroup>
   );

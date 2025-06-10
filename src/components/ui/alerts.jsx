@@ -16,7 +16,7 @@ function Alert({ submitSuccess, submitError, successMessage, errorMessage }) {
             )}
         </>
     );
-}
+}   
 
 export default Alert;
 

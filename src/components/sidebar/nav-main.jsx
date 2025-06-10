@@ -19,12 +19,26 @@ import {
 } from "@/components/ui/sidebar"
 
 export function NavMainDropdown({
-  itemsDropdown
+  itemsDropdown,
+  role
 }) {
+  const getLabel = () => {
+    switch (role) {
+      case 'admin':
+        return 'Gerenciamento'
+      case 'teacher':
+        return 'Conteúdo'
+      case 'student':
+        return 'Estudos'
+      default:
+        return 'Materiais'
+    }
+  }
+
   return (
     <>
       <SidebarGroup>
-        <SidebarGroupLabel>Materiais</SidebarGroupLabel>
+        <SidebarGroupLabel>{getLabel()}</SidebarGroupLabel>
         <SidebarMenu>
           {itemsDropdown.map((item) => (
             <Collapsible
@@ -64,17 +78,30 @@ export function NavMainDropdown({
 }
 
 export function NavMain({
-  items
+  items,
+  role
 }) {
+  const getLabel = () => {
+    switch (role) {
+      case 'admin':
+        return 'Administração'
+      case 'teacher':
+        return 'Professor'
+      case 'student':
+        return 'Aluno'
+      default:
+        return 'Plataforma'
+    }
+  }
+
   return (
     <>
       <SidebarGroup>
-        <SidebarGroupLabel>Plataforma</SidebarGroupLabel>
+        <SidebarGroupLabel>{getLabel()}</SidebarGroupLabel>
         <SidebarMenu>
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton asChild>
-                
                 <a href={item.url}>
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>
@@ -84,7 +111,6 @@ export function NavMain({
           ))}
         </SidebarMenu>
       </SidebarGroup>
-
     </>
   )
 }

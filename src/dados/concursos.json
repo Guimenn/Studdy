@@ -1,0 +1,299 @@
+[
+    {
+      "title": "ITA",
+      "description": "Instituto Tecnológico de Aeronáutica",
+      "link": "https://www.ita.br/",
+      "icon": "School",
+      "color": "bg-indigo-500",
+      "date": "2024-12-01",
+      "type": "militares"
+    },
+    {
+      "title": "IME",
+      "description": "Instituto Militar de Engenharia", 
+      "link": "https://www.ime.eb.br/",
+      "icon": "School",
+      "color": "bg-orange-500",
+      "date": "2024-12-01",
+      "type": "militares"
+    },
+    {
+      "title": "AFA",
+      "description": "Academia da Força Aérea",
+      "link": "https://www.afa.eb.mil.br/",
+      "icon": "Shield",
+      "color": "bg-sky-500",
+      "date": "2024-05-01",
+      "type": "militares"
+    },
+    {
+      "title": "ESPCEX",
+      "description": "Escola Preparatória de Cadetes do Exército",
+      "link": "https://www.espcex.eb.mil.br/",
+      "icon": "Shield", 
+      "color": "bg-emerald-500",
+      "date": "2024-09-01",
+      "type": "militares"
+    },
+    {
+      "title": "EN",
+      "description": "Escola Naval",
+      "link": "https://www.marinha.mil.br/ensino/",
+      "icon": "Shield",
+      "color": "bg-blue-600",
+      "date": "2024-06-01",
+      "type": "militares"
+    },
+    {
+      "title": "EsPCEx",
+      "description": "Escola Preparatória de Cadetes do Exército",
+      "link": "https://www.espcex.eb.mil.br/",
+      "icon": "Shield",
+      "color": "bg-green-600", 
+      "date": "2024-09-01",
+      "type": "militares"
+    },
+    {
+      "title": "CFO",
+      "description": "Curso de Formação de Oficiais",
+      "link": "https://www.eb.mil.br/",
+      "icon": "Shield",
+      "color": "bg-yellow-600",
+      "date": "2024-07-01",
+      "type": "militares"
+    },
+    {
+      "title": "CFS",
+      "description": "Curso de Formação de Sargentos",
+      "link": "https://www.eb.mil.br/",
+      "icon": "Shield",
+      "color": "bg-red-600",
+      "date": "2024-07-01",
+      "type": "militares"
+    },
+    {
+      "title": "PM-SP",
+      "description": "Polícia Militar de São Paulo",
+      "link": "https://www.policiamilitar.sp.gov.br/",
+      "icon": "Shield",
+      "color": "bg-blue-700",
+      "date": "2024-03-01",
+      "type": "estaduais"
+    },
+    {
+      "title": "PC-SP",
+      "description": "Polícia Civil de São Paulo",
+      "link": "https://www.policiacivil.sp.gov.br/",
+      "icon": "Shield",
+      "color": "bg-red-700",
+      "date": "2024-04-01",
+      "type": "estaduais"
+    },
+    {
+      "title": "PM-RJ",
+      "description": "Polícia Militar do Rio de Janeiro",
+      "link": "https://www.policiamilitar.rj.gov.br/",
+      "icon": "Shield",
+      "color": "bg-green-700",
+      "date": "2024-05-01",
+      "type": "estaduais"
+    },
+    {
+      "title": "PC-RJ",
+      "description": "Polícia Civil do Rio de Janeiro",
+      "link": "https://www.policiacivil.rj.gov.br/",
+      "icon": "Shield",
+      "color": "bg-yellow-700",
+      "date": "2024-06-01",
+      "type": "estaduais"
+    },
+    {
+      "title": "PM-MG",
+      "description": "Polícia Militar de Minas Gerais",
+      "link": "https://www.policiamilitar.mg.gov.br/",
+      "icon": "Shield",
+      "color": "bg-blue-800",
+      "date": "2024-07-01",
+      "type": "estaduais"
+    },
+    {
+      "title": "PC-MG",
+      "description": "Polícia Civil de Minas Gerais",
+      "link": "https://www.policiacivil.mg.gov.br/",
+      "icon": "Shield",
+      "color": "bg-red-800",
+      "date": "2024-08-01",
+      "type": "estaduais"
+    },
+    {
+      "title": "BB",
+      "description": "Banco do Brasil",
+      "link": "https://www.bb.com.br/",
+      "icon": "Briefcase",
+      "color": "bg-yellow-700",
+      "date": "2024-12-31",
+      "type": "bancarios"
+    },
+    {
+      "title": "Caixa Econômica",
+      "description": "Banco Caixa Econômica Federal",
+      "link": "https://www.caixa.gov.br/",
+      "icon": "Briefcase",
+      "color": "bg-blue-800",
+      "date": "2024-12-31",
+      "type": "bancarios"
+    },
+    {
+      "title": "Bradesco",
+      "description": "Banco Bradesco",
+      "link": "https://www.bradesco.com.br/",
+      "icon": "Briefcase",
+      "color": "bg-red-800",
+      "date": "2024-12-31",
+      "type": "bancarios"
+    },
+    {
+      "title": "Itaú",
+      "description": "Banco Itaú",
+      "link": "https://www.itau.com.br/",
+      "icon": "Briefcase",
+      "color": "bg-orange-800",
+      "date": "2024-12-31",
+      "type": "bancarios"
+    },
+    {
+      "title": "Santander",
+      "description": "Banco Santander",
+      "link": "https://www.santander.com.br/",
+      "icon": "Briefcase",
+      "color": "bg-red-900",
+      "date": "2024-12-31",
+      "type": "bancarios"
+    },
+    {
+      "title": "Receita Federal",
+      "description": "Auditor Fiscal da Receita Federal",
+      "link": "https://www.gov.br/receitafederal/",
+      "icon": "Scale",
+      "color": "bg-green-800",
+      "date": "2024-12-31",
+      "type": "federais"
+    },
+    {
+      "title": "TCU",
+      "description": "Tribunal de Contas da União",
+      "link": "https://portal.tcu.gov.br/",
+      "icon": "Landmark",
+      "color": "bg-purple-800",
+      "date": "2024-12-31",
+      "type": "federais"
+    },
+    {
+      "title": "STF",
+      "description": "Supremo Tribunal Federal",
+      "link": "https://www.stf.jus.br/",
+      "icon": "Scale",
+      "color": "bg-red-800",
+      "date": "2024-12-31",
+      "type": "federais"
+    },
+    {
+      "title": "BNDES",
+      "description": "Banco Nacional de Desenvolvimento",
+      "link": "https://www.bndes.gov.br/",
+      "icon": "Building2",
+      "color": "bg-blue-900",
+      "date": "2024-12-31",
+      "type": "federais"
+    },
+    {
+      "title": "Câmara dos Deputados",
+      "description": "Câmara dos Deputados Federais",
+      "link": "https://www.camara.leg.br/",
+      "icon": "Landmark",
+      "color": "bg-green-900",
+      "date": "2024-12-31",
+      "type": "federais"
+    },
+    {
+      "title": "Senado Federal",
+      "description": "Senado Federal do Brasil",
+      "link": "https://www.senado.leg.br/",
+      "icon": "Landmark",
+      "color": "bg-yellow-900",
+      "date": "2024-12-31",
+      "type": "federais"
+    },
+    {
+      "title": "STJ",
+      "description": "Superior Tribunal de Justiça",
+      "link": "https://www.stj.jus.br/",
+      "icon": "Scale",
+      "color": "bg-purple-900",
+      "date": "2024-12-31",
+      "type": "federais"
+    },
+    {
+      "title": "TST",
+      "description": "Tribunal Superior do Trabalho",
+      "link": "https://www.tst.jus.br/",
+      "icon": "Scale",
+      "color": "bg-blue-950",
+      "date": "2024-12-31",
+      "type": "federais"
+    },
+    {
+      "title": "TRT",
+      "description": "Tribunal Regional do Trabalho",
+      "link": "https://www.tst.jus.br/",
+      "icon": "Scale",
+      "color": "bg-red-950",
+      "date": "2024-12-31",
+      "type": "federais"
+    },
+    {
+      "title": "TRF",
+      "description": "Tribunal Regional Federal",
+      "link": "https://www.trf1.jus.br/",
+      "icon": "Scale",
+      "color": "bg-green-950",
+      "date": "2024-12-31",
+      "type": "federais"
+    },
+    {
+      "title": "MPF",
+      "description": "Ministério Público Federal",
+      "link": "https://www.mpf.mp.br/",
+      "icon": "Scale",
+      "color": "bg-yellow-950",
+      "date": "2024-12-31",
+      "type": "federais"
+    },
+    {
+      "title": "DPF",
+      "description": "Departamento de Polícia Federal",
+      "link": "https://www.gov.br/pf/",
+      "icon": "Shield",
+      "color": "bg-blue-950",
+      "date": "2024-12-31",
+      "type": "federais"
+    },
+    {
+      "title": "PRF",
+      "description": "Polícia Rodoviária Federal",
+      "link": "https://www.gov.br/prf/",
+      "icon": "Shield",
+      "color": "bg-red-950",
+      "date": "2024-12-31",
+      "type": "federais"
+    },
+    {
+      "title": "TCESP",
+      "description": "Tribunal de Contas do Estado de SP",
+      "link": "https://www.tce.sp.gov.br/",
+      "icon": "Scale",
+      "color": "bg-red-900",
+      "date": "2024-12-31",
+      "type": "estaduais"
+    }
+]

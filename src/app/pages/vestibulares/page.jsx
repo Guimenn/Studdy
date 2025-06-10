@@ -3,247 +3,127 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Logo from "@/components/ui/logo";
-import { ExternalLink, GraduationCap, Calendar, BookOpen, School, Search, Star, StarOff } from "lucide-react";
+import { ExternalLink, GraduationCap, Calendar, BookOpen, School, Search, Star, StarOff, Plus, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
+import { BaseFormField, SelectFormField, IconSelector } from "@/components/ui/formfield";
+import React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import Cookies from 'js-cookie';
+import { toast } from 'sonner';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useUser } from "@/contexts/UserContext";
+import { PageLoader } from "@/components/ui/loader";
 
-const vestibulares = [
-  {
-    title: "ENEM",
-    description: "Exame Nacional do Ensino Médio",
-    link: "https://www.gov.br/inep/pt-br/assuntos/noticias/enem/enem-2024",
-    icon: GraduationCap,
-    color: "bg-blue-500",
-    date: "Novembro 2024",
-    type: "Público",
-    state: "Nacional"
-  },
-  {
-    title: "FUVEST",
-    description: "Fundação Universitária para o Vestibular",
-    link: "https://www.fuvest.br/",
-    icon: BookOpen,
-    color: "bg-red-500",
-    date: "Janeiro 2025",
-    type: "Público",
-    state: "SP"
-  },
-  {
-    title: "UNICAMP",
-    description: "Universidade Estadual de Campinas",
-    link: "https://www.comvest.unicamp.br/",
-    icon: GraduationCap,
-    color: "bg-green-500",
-    date: "Janeiro 2025",
-    type: "Público",
-    state: "SP"
-  },
-  {
-    title: "UNESP",
-    description: "Universidade Estadual Paulista",
-    link: "https://www.vunesp.com.br/",
-    icon: BookOpen,
-    color: "bg-yellow-500",
-    date: "Janeiro 2025",
-    type: "Público",
-    state: "SP"
-  },
-  {
-    title: "UNIFESP",
-    description: "Universidade Federal de São Paulo",
-    link: "https://www.unifesp.br/",
-    icon: GraduationCap,
-    color: "bg-purple-500",
-    date: "Janeiro 2025",
-    type: "Público",
-    state: "SP"
-  },
-  {
-    title: "USP",
-    description: "Universidade de São Paulo - Vestibular",
-    link: "https://www.usp.br/",
-    icon: School,
-    color: "bg-red-600",
-    date: "Janeiro 2025",
-    type: "Público",
-    state: "SP"
-  },
-  {
-    title: "UNB",
-    description: "Universidade de Brasília",
-    link: "https://www.unb.br/",
-    icon: School,
-    color: "bg-green-600",
-    date: "Julho 2024",
-    type: "Público",
-    state: "DF"
-  },
-  {
-    title: "UFMG",
-    description: "Universidade Federal de Minas Gerais",
-    link: "https://www.ufmg.br/",
-    icon: School,
-    color: "bg-yellow-600",
-    date: "Novembro 2024",
-    type: "Público",
-    state: "MG"
-  },
-  {
-    title: "UFRJ",
-    description: "Universidade Federal do Rio de Janeiro",
-    link: "https://www.ufrj.br/",
-    icon: School,
-    color: "bg-blue-700",
-    date: "Janeiro 2025",
-    type: "Público",
-    state: "RJ"
-  },
-  {
-    title: "UFRGS",
-    description: "Universidade Federal do Rio Grande do Sul",
-    link: "https://www.ufrgs.br/",
-    icon: School,
-    color: "bg-red-700",
-    date: "Janeiro 2025",
-    type: "Público",
-    state: "RS"
-  },
-  {
-    title: "UFSC",
-    description: "Universidade Federal de Santa Catarina",
-    link: "https://www.ufsc.br/",
-    icon: School,
-    color: "bg-green-700",
-    date: "Dezembro 2024",
-    type: "Público",
-    state: "SC"
-  },
-  {
-    title: "UFBA",
-    description: "Universidade Federal da Bahia",
-    link: "https://www.ufba.br/",
-    icon: School,
-    color: "bg-blue-800",
-    date: "Dezembro 2024",
-    type: "Público",
-    state: "BA"
-  },
-  {
-    title: "UFPE",
-    description: "Universidade Federal de Pernambuco",
-    link: "https://www.ufpe.br/",
-    icon: School,
-    color: "bg-red-800",
-    date: "Dezembro 2024",
-    type: "Público",
-    state: "PE"
-  },
-  {
-    title: "UFRN",
-    description: "Universidade Federal do Rio Grande do Norte",
-    link: "https://www.ufrn.br/",
-    icon: School,
-    color: "bg-green-800",
-    date: "Novembro 2024",
-    type: "Público",
-    state: "RN"
-  },
-  {
-    title: "PUC-SP",
-    description: "Pontifícia Universidade Católica de São Paulo",
-    link: "https://www.pucsp.br/",
-    icon: School,
-    color: "bg-purple-800",
-    date: "Dezembro 2024",
-    type: "Privado",
-    state: "SP"
-  },
-  {
-    title: "PUC-Rio",
-    description: "Pontifícia Universidade Católica do Rio de Janeiro",
-    link: "https://www.puc-rio.br/",
-    icon: School,
-    color: "bg-blue-900",
-    date: "Dezembro 2024",
-    type: "Privado",
-    state: "RJ"
-  },
-  {
-    title: "PUC-MG",
-    description: "Pontifícia Universidade Católica de Minas Gerais",
-    link: "https://www.pucminas.br/",
-    icon: School,
-    color: "bg-red-900",
-    date: "Dezembro 2024",
-    type: "Privado",
-    state: "MG"
-  },
-  {
-    title: "PUC-RS",
-    description: "Pontifícia Universidade Católica do Rio Grande do Sul",
-    link: "https://www.pucrs.br/",
-    icon: School,
-    color: "bg-green-900",
-    date: "Dezembro 2024",
-    type: "Privado",
-    state: "RS"
-  },
-  {
-    title: "PUC-Campinas",
-    description: "Pontifícia Universidade Católica de Campinas",
-    link: "https://www.puc-campinas.edu.br/",
-    icon: School,
-    color: "bg-yellow-900",
-    date: "Dezembro 2024",
-    type: "Privado",
-    state: "SP"
-  },
-  {
-    title: "Mackenzie",
-    description: "Universidade Presbiteriana Mackenzie",
-    link: "https://www.mackenzie.br/",
-    icon: School,
-    color: "bg-blue-950",
-    date: "Dezembro 2024",
-    type: "Privado",
-    state: "SP"
-  },
-  {
-    title: "Insper",
-    description: "Instituto de Ensino e Pesquisa",
-    link: "https://www.insper.edu.br/",
-    icon: School,
-    color: "bg-red-950",
-    date: "Dezembro 2024",
-    type: "Privado",
-    state: "SP"
-  },
-  {
-    title: "FGV",
-    description: "Fundação Getúlio Vargas",
-    link: "https://www.fgv.br/",
-    icon: School,
-    color: "bg-green-950",
-    date: "Dezembro 2024",
-    type: "Privado",
-    state: "SP"
-  },
-  {
-    title: "ESPM",
-    description: "Escola Superior de Propaganda e Marketing",
-    link: "https://www.espm.br/",
-    icon: School,
-    color: "bg-yellow-950",
-    date: "Dezembro 2024",
-    type: "Privado",
-    state: "SP"
-  }
+
+const VESTIBULAR_CATEGORIES = [
+  { value: 'publico', label: 'Público' },
+  { value: 'privado', label: 'Privado' }
 ];
 
+const ICON_OPTIONS = {
+  vestibulares: [
+    { label: 'Graduação', value: 'GraduationCap', icon: GraduationCap },
+    { label: 'Livro', value: 'BookOpen', icon: BookOpen },
+    { label: 'Escola', value: 'School', icon: School },
+    { label: 'Calendário', value: 'Calendar', icon: Calendar }
+  ]
+};
+
+
+
+const iconMap = {
+  GraduationCap: GraduationCap,
+  BookOpen: BookOpen,
+  School: School,
+  Calendar: Calendar
+};
+
 export default function VestibularesPage() {
+  const { userRole } = useUser();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState('todos');
+  const [isCreateVestibularModalOpen, setIsCreateVestibularModalOpen] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [vestibularToDelete, setVestibularToDelete] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthorized, setIsAuthorized] = useState(false);
   const [favorites, setFavorites] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [vestibulares, setVestibulares] = useState([]);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // Simulate loading user role
+    const timer = setTimeout(() => {
+      setIsAuthorized(true);
+      setIsLoading(false);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const fetchVestibulares = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const token = Cookies.get('token');
+        if (!token) throw new Error('Token não encontrado');
+
+        console.log('Buscando lista de vestibulares');
+        const response = await fetch('http://localhost:3000/contestsEntrace/entrance-exams', {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Erro ao buscar lista de vestibulares');
+        }
+
+        const data = await response.json();
+        console.log('Lista de vestibulares recebida:', data);
+        
+        // Transformar os dados para o formato esperado pelo componente
+        const formattedVestibulares = data.map(vestibular => ({
+          ...vestibular,
+          category: vestibular.type, // Mapear type para category para compatibilidade com o filtro
+          date: new Date(vestibular.date).toLocaleDateString('pt-BR') // Formatar data
+        }));
+        
+        setVestibulares(formattedVestibulares);
+      } catch (err) {
+        console.error('Erro ao buscar vestibulares:', err);
+        setError(err.message);
+        toast.error(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchVestibulares();
+  }, []);
 
   useEffect(() => {
     const savedFavorites = localStorage.getItem('vestibulares_favorites');
@@ -262,24 +142,227 @@ export default function VestibularesPage() {
 
   const types = [
     { id: 'todos', label: 'Todos' },
-    { id: 'Público', label: 'Públicos' },
-    { id: 'Privado', label: 'Privados' }
+    { id: 'publico', label: 'Públicos' },
+    { id: 'privado', label: 'Privados' }
   ];
 
   const filterItems = (items) => {
     return items.filter(item => {
       const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          item.description.toLowerCase().includes(searchTerm.toLowerCase());
+        item.description.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesType = selectedType === 'todos' || item.type === selectedType;
       return matchesSearch && matchesType;
     });
+  };
+
+
+
+  const vestibularSchema = z.object({
+    title: z.string().min(1, { message: 'Title is required' }),
+    link: z.string().url({ message: 'Invalid URL' }),
+    type: z.string().min(1, { message: 'Type is required' }),
+    icon: z.string().min(1, { message: 'Icon is required' }),
+    color: z.string().min(1, { message: 'Color is required' }),
+    description: z.string().min(1, { message: 'Description is required' }),
+    date: z.coerce.date({ message: 'Invalid date' }),
+  });
+
+  const CreateVestibularModal = () => {
+    const form = useForm({
+      resolver: zodResolver(vestibularSchema),
+      defaultValues: {
+        title: '',
+        link: '',
+        type: '',
+        icon: '',
+        color: '',
+        description: '',
+        date: '',
+      },
+    });
+
+    const onSubmit = async (formData) => {
+      setIsSubmitting(true);
+
+      try {
+        const token = Cookies.get('token');
+        if (!token) {
+          throw new Error('Token não encontrado');
+        }
+
+        // Preparar dados do vestibular para envio
+        const vestibularData = {
+          title: formData.title,
+          link: formData.link,
+          type: formData.type,
+          icon: formData.icon,
+          color: formData.color,
+          description: formData.description,
+          date: formData.date,
+        };
+
+        console.log('Enviando dados do vestibular:', vestibularData);
+
+        // Enviar dados do vestibular para o backend
+        const response = await fetch(
+          'http://localhost:3000/contestsEntrace/entrance-exams',
+          {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(vestibularData),
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error(`Erro HTTP: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log('Vestibular criado:', result);
+
+        // Mostrar mensagem de sucesso
+        toast.success('Vestibular criado com sucesso!');
+        window.location.reload();
+        setIsCreateVestibularModalOpen(false);
+        form.reset();
+
+      } catch (error) {
+        console.error('Erro ao criar vestibular:', error);
+        toast.error('Erro ao criar vestibular. Tente novamente.');
+      } finally {
+        setIsSubmitting(false);
+      }
+    };
+    return (
+      <>
+        <Dialog open={isCreateVestibularModalOpen} onOpenChange={setIsCreateVestibularModalOpen}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Novo Vestibular</DialogTitle>
+            </DialogHeader>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <BaseFormField
+                  control={form.control}
+                  name="title"
+                  label="Nome do Vestibular"
+                  placeholder="Nome do Vestibular"
+                />
+                <BaseFormField
+                  control={form.control}
+                  name="link"
+                  label="Link do Vestibular"
+                  placeholder="https://..."
+                />
+                <SelectFormField
+                  control={form.control}
+                  name="type"
+                  label="Categoria"
+                  options={VESTIBULAR_CATEGORIES}
+                  placeholder="Selecione a categoria"
+                />
+                <BaseFormField
+                  control={form.control}
+                  name="date"
+                  label="Data do Vestibular"
+                  type="date"
+                />
+                <IconSelector
+                  control={form.control}
+                  name="icon"
+                  label="Ícone"
+                  options={ICON_OPTIONS.vestibulares}
+                  form={form}
+                />
+                <BaseFormField
+                  control={form.control}
+                  name="color"
+                  label="Cor"
+                  placeholder="bg-blue-500"
+                />
+                <BaseFormField
+                  control={form.control}
+                  name="description"
+                  label="Descrição"
+                  placeholder="Descrição do vestibular"
+                />
+
+
+                <DialogFooter>
+                  <Button type="button" variant="outline" onClick={() => setIsCreateVestibularModalOpen(false)}>
+                    Cancelar
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? 'Cadastrando...' : 'Cadastrar Vestibular'}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+
+      </>
+    );
+  };
+
+  const handleDeleteClick = (vestibular) => {
+    setVestibularToDelete(vestibular);
+    setIsDeleteConfirmOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!vestibularToDelete) return;
+
+    try {
+      const token = Cookies.get('token');
+      if (!token) throw new Error('Token não encontrado');
+
+      const response = await fetch(`http://localhost:3000/contestsEntrace/entrance-exams/${vestibularToDelete.id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao deletar vestibular');
+      }
+
+      // Atualizar a lista de vestibulares
+      setVestibulares(prev => prev.filter(v => v.id !== vestibularToDelete.id));
+      toast.success('Vestibular deletado com sucesso!');
+    } catch (error) {
+      console.error('Erro ao deletar vestibular:', error);
+      toast.error('Erro ao deletar vestibular. Tente novamente.');
+    } finally {
+      setIsDeleteConfirmOpen(false);
+      setVestibularToDelete(null);
+    }
   };
 
   const uniqueDates = [...new Set(vestibulares.map(v => v.date))];
   const uniqueTypes = [...new Set(vestibulares.map(v => v.type))];
   const uniqueStates = [...new Set(vestibulares.map(v => v.state))];
 
+  const renderIcon = (iconName) => {
+    const IconComponent = iconMap[iconName];
+    if (!IconComponent) return null;
+    return <IconComponent className="h-6 w-6" />;
+  };
+
+  if (isLoading) {
+    return <PageLoader />;
+  }
+
   return (
+    <>
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto p-4 md:p-6">
         <div className="mx-auto">
@@ -288,7 +371,12 @@ export default function VestibularesPage() {
             <h1 className="mt-4 text-2xl font-bold tracking-tight">Vestibulares</h1>
             <p className="mt-2 text-center">Acompanhe os principais vestibulares do Brasil</p>
           </div>
-
+          {isAuthorized && (userRole === "admin" || userRole === "teacher") && (
+            <Button onClick={() => setIsCreateVestibularModalOpen(true)} className="mb-4">
+              <Plus className="h-4 w-4 mr-2 " />
+              Novo Vestibular
+            </Button>
+          )}
           <div className="mb-6 space-y-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
@@ -323,8 +411,8 @@ export default function VestibularesPage() {
               >
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <div className={`p-3 rounded-lg ${vestibular.color} text-white`}>
-                      <vestibular.icon className="h-6 w-6" />
+                    <div className="p-3 rounded-lg text-white" style={{ backgroundColor: vestibular.color || '#133D86' }}>
+                      {renderIcon(vestibular.icon)}
                     </div>
                     <div className="flex items-center gap-2">
                       <button
@@ -341,6 +429,14 @@ export default function VestibularesPage() {
                         <Calendar className="h-4 w-4 mr-1" />
                         {vestibular.date}
                       </div>
+                      {(userRole === 'admin' || userRole === 'teacher') && (
+                        <button
+                          onClick={() => handleDeleteClick(vestibular)}
+                          className="text-gray-400 hover:text-red-500 transition-colors ml-2"
+                        >
+                          <Trash2 className="h-5 w-5" />
+                        </button>
+                      )}
                     </div>
                   </div>
                   <CardTitle className="text-xl mt-4 h-[32px] line-clamp-1">{vestibular.title}</CardTitle>
@@ -361,5 +457,35 @@ export default function VestibularesPage() {
         </div>
       </div>
     </div>
+    <CreateVestibularModal />
+    <Dialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Confirmar Exclusão</DialogTitle>
+          <DialogDescription>
+            Tem certeza que deseja excluir o vestibular "{vestibularToDelete?.title}"? Esta ação não pode ser desfeita.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setIsDeleteConfirmOpen(false);
+              setVestibularToDelete(null);
+            }}
+          >
+            Cancelar
+          </Button>
+          <Button
+            type="button"
+            onClick={handleDeleteConfirm}
+            className="bg-red-500 hover:bg-red-600"
+          >
+            Deletar
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
-} 
+}

@@ -1,430 +1,511 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import Logo from "@/components/ui/logo";
-import { ExternalLink, Calendar, Shield, Briefcase, School, Building2, Landmark, Scale, Search, Star, StarOff } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import Logo from '@/components/ui/logo';
+import {
+	ExternalLink,
+	Calendar,
+	Shield,
+	Briefcase,
+	School,
+	Building2,
+	Landmark,
+	Scale,
+	Search,
+	Star,
+	StarOff,
+	Plus,
+	Trash2,
+} from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { useState, useEffect } from 'react';
+import React from 'react';
+import Cookies from 'js-cookie';
+import { toast } from 'sonner';
+import { useForm } from 'react-hook-form';
+import { BaseFormField, SelectFormField, IconSelector } from '@/components/ui/formfield';
+import {
+	Form,
+	FormControl,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from '@/components/ui/form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogFooter,
+	DialogDescription,
+} from '@/components/ui/dialog';
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { useUser } from '@/contexts/UserContext';
+import { PageLoader } from '@/components/ui/loader';
+import { useRouter } from 'next/navigation';
 
-const concursos = [
-  {
-    title: "ITA",
-    description: "Instituto Tecnológico de Aeronáutica",
-    link: "https://www.ita.br/",
-    icon: School,
-    color: "bg-indigo-500",
-    date: "Dezembro 2024",
-    category: "militares"
-  },
-  {
-    title: "IME",
-    description: "Instituto Militar de Engenharia",
-    link: "https://www.ime.eb.br/",
-    icon: School,
-    color: "bg-orange-500",
-    date: "Dezembro 2024",
-    category: "militares"
-  },
-  {
-    title: "AFA",
-    description: "Academia da Força Aérea",
-    link: "https://www.afa.eb.mil.br/",
-    icon: Shield,
-    color: "bg-sky-500",
-    date: "Maio 2024",
-    category: "militares"
-  },
-  {
-    title: "ESPCEX",
-    description: "Escola Preparatória de Cadetes do Exército",
-    link: "https://www.espcex.eb.mil.br/",
-    icon: Shield,
-    color: "bg-emerald-500",
-    date: "Setembro 2024",
-    category: "militares"
-  },
-  {
-    title: "EN",
-    description: "Escola Naval",
-    link: "https://www.marinha.mil.br/ensino/",
-    icon: Shield,
-    color: "bg-blue-600",
-    date: "Junho 2024",
-    category: "militares"
-  },
-  {
-    title: "EsPCEx",
-    description: "Escola Preparatória de Cadetes do Exército",
-    link: "https://www.espcex.eb.mil.br/",
-    icon: Shield,
-    color: "bg-green-600",
-    date: "Setembro 2024",
-    category: "militares"
-  },
-  {
-    title: "CFO",
-    description: "Curso de Formação de Oficiais",
-    link: "https://www.eb.mil.br/",
-    icon: Shield,
-    color: "bg-yellow-600",
-    date: "Julho 2024",
-    category: "militares"
-  },
-  {
-    title: "CFS",
-    description: "Curso de Formação de Sargentos",
-    link: "https://www.eb.mil.br/",
-    icon: Shield,
-    color: "bg-red-600",
-    date: "Julho 2024",
-    category: "militares"
-  },
-  {
-    title: "PM-SP",
-    description: "Polícia Militar de São Paulo",
-    link: "https://www.policiamilitar.sp.gov.br/",
-    icon: Shield,
-    color: "bg-blue-700",
-    date: "Março 2024",
-    category: "estaduais"
-  },
-  {
-    title: "PC-SP",
-    description: "Polícia Civil de São Paulo",
-    link: "https://www.policiacivil.sp.gov.br/",
-    icon: Shield,
-    color: "bg-red-700",
-    date: "Abril 2024",
-    category: "estaduais"
-  },
-  {
-    title: "PM-RJ",
-    description: "Polícia Militar do Rio de Janeiro",
-    link: "https://www.policiamilitar.rj.gov.br/",
-    icon: Shield,
-    color: "bg-green-700",
-    date: "Maio 2024",
-    category: "estaduais"
-  },
-  {
-    title: "PC-RJ",
-    description: "Polícia Civil do Rio de Janeiro",
-    link: "https://www.policiacivil.rj.gov.br/",
-    icon: Shield,
-    color: "bg-yellow-700",
-    date: "Junho 2024",
-    category: "estaduais"
-  },
-  {
-    title: "PM-MG",
-    description: "Polícia Militar de Minas Gerais",
-    link: "https://www.policiamilitar.mg.gov.br/",
-    icon: Shield,
-    color: "bg-blue-800",
-    date: "Julho 2024",
-    category: "estaduais"
-  },
-  {
-    title: "PC-MG",
-    description: "Polícia Civil de Minas Gerais",
-    link: "https://www.policiacivil.mg.gov.br/",
-    icon: Shield,
-    color: "bg-red-800",
-    date: "Agosto 2024",
-    category: "estaduais"
-  },
-  {
-    title: "BB",
-    description: "Banco do Brasil",
-    link: "https://www.bb.com.br/",
-    icon: Briefcase,
-    color: "bg-yellow-700",
-    date: "Em breve",
-    category: "bancarios"
-  },
-  {
-    title: "Caixa Econômica",
-    description: "Banco Caixa Econômica Federal",
-    link: "https://www.caixa.gov.br/",
-    icon: Briefcase,
-    color: "bg-blue-800",
-    date: "Em breve",
-    category: "bancarios"
-  },
-  {
-    title: "Bradesco",
-    description: "Banco Bradesco",
-    link: "https://www.bradesco.com.br/",
-    icon: Briefcase,
-    color: "bg-red-800",
-    date: "Em breve",
-    category: "bancarios"
-  },
-  {
-    title: "Itaú",
-    description: "Banco Itaú",
-    link: "https://www.itau.com.br/",
-    icon: Briefcase,
-    color: "bg-orange-800",
-    date: "Em breve",
-    category: "bancarios"
-  },
-  {
-    title: "Santander",
-    description: "Banco Santander",
-    link: "https://www.santander.com.br/",
-    icon: Briefcase,
-    color: "bg-red-900",
-    date: "Em breve",
-    category: "bancarios"
-  },
-  {
-    title: "Receita Federal",
-    description: "Auditor Fiscal da Receita Federal",
-    link: "https://www.gov.br/receitafederal/",
-    icon: Scale,
-    color: "bg-green-800",
-    date: "Em breve",
-    category: "federais"
-  },
-  {
-    title: "TCU",
-    description: "Tribunal de Contas da União",
-    link: "https://portal.tcu.gov.br/",
-    icon: Landmark,
-    color: "bg-purple-800",
-    date: "Em breve",
-    category: "federais"
-  },
-  {
-    title: "STF",
-    description: "Supremo Tribunal Federal",
-    link: "https://www.stf.jus.br/",
-    icon: Scale,
-    color: "bg-red-800",
-    date: "Em breve",
-    category: "federais"
-  },
-  {
-    title: "BNDES",
-    description: "Banco Nacional de Desenvolvimento",
-    link: "https://www.bndes.gov.br/",
-    icon: Building2,
-    color: "bg-blue-900",
-    date: "Em breve",
-    category: "federais"
-  },
-  {
-    title: "Câmara dos Deputados",
-    description: "Câmara dos Deputados Federais",
-    link: "https://www.camara.leg.br/",
-    icon: Landmark,
-    color: "bg-green-900",
-    date: "Em breve",
-    category: "federais"
-  },
-  {
-    title: "Senado Federal",
-    description: "Senado Federal do Brasil",
-    link: "https://www.senado.leg.br/",
-    icon: Landmark,
-    color: "bg-yellow-900",
-    date: "Em breve",
-    category: "federais"
-  },
-  {
-    title: "STJ",
-    description: "Superior Tribunal de Justiça",
-    link: "https://www.stj.jus.br/",
-    icon: Scale,
-    color: "bg-purple-900",
-    date: "Em breve",
-    category: "federais"
-  },
-  {
-    title: "TST",
-    description: "Tribunal Superior do Trabalho",
-    link: "https://www.tst.jus.br/",
-    icon: Scale,
-    color: "bg-blue-950",
-    date: "Em breve",
-    category: "federais"
-  },
-  {
-    title: "TRT",
-    description: "Tribunal Regional do Trabalho",
-    link: "https://www.tst.jus.br/",
-    icon: Scale,
-    color: "bg-red-950",
-    date: "Em breve",
-    category: "federais"
-  },
-  {
-    title: "TRF",
-    description: "Tribunal Regional Federal",
-    link: "https://www.trf1.jus.br/",
-    icon: Scale,
-    color: "bg-green-950",
-    date: "Em breve",
-    category: "federais"
-  },
-  {
-    title: "MPF",
-    description: "Ministério Público Federal",
-    link: "https://www.mpf.mp.br/",
-    icon: Scale,
-    color: "bg-yellow-950",
-    date: "Em breve",
-    category: "federais"
-  },
-  {
-    title: "DPF",
-    description: "Departamento de Polícia Federal",
-    link: "https://www.gov.br/pf/",
-    icon: Shield,
-    color: "bg-blue-950",
-    date: "Em breve",
-    category: "federais"
-  },
-  {
-    title: "PRF",
-    description: "Polícia Rodoviária Federal",
-    link: "https://www.gov.br/prf/",
-    icon: Shield,
-    color: "bg-red-950",
-    date: "Em breve",
-    category: "federais"
-  },
-  {
-    title: "TCESP",
-    description: "Tribunal de Contas do Estado de SP",
-    link: "https://www.tce.sp.gov.br/",
-    icon: Scale,
-    color: "bg-red-900",
-    date: "Em breve",
-    category: "estaduais"
-  }
+const CONCURSO_CATEGORIES = [
+	{ value: 'militares', label: 'Militares' },
+	{ value: 'federais', label: 'Federais' },
+	{ value: 'estaduais', label: 'Estaduais' },
+	{ value: 'municipais', label: 'Municipais' },
 ];
 
+const ICON_OPTIONS = {
+	concursos: [
+		{ label: 'Escudo', value: 'Shield', icon: Shield },
+		{ label: 'Escola', value: 'School', icon: School },
+		{ label: 'Pasta', value: 'Briefcase', icon: Briefcase },
+		{ label: 'Prédio', value: 'Building2', icon: Building2 },
+		{ label: 'Monumento', value: 'Landmark', icon: Landmark },
+		{ label: 'Balança', value: 'Scale', icon: Scale },
+	],
+};
+
 export default function ConcursosPage() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('todos');
-  const [favorites, setFavorites] = useState([]);
+	const { userRole } = useUser();
+	const router = useRouter();
+	const [searchTerm, setSearchTerm] = useState('');
+	const [selectedCategory, setSelectedCategory] = useState('todos');
+	const [favorites, setFavorites] = useState([]);
+	const [isCreateConcursoModalOpen, setIsCreateConcursoModalOpen] = useState(false);
+	const [isLoading, setIsLoading] = useState(true);
+	const [isAuthorized, setIsAuthorized] = useState(false);
+	const [concursos, setConcursos] = useState([]);
+	const [error, setError] = useState(null);
+	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+	const [concursoToDelete, setConcursoToDelete] = useState(null);
 
-  useEffect(() => {
-    const savedFavorites = localStorage.getItem('concursos_favorites');
-    if (savedFavorites) {
-      setFavorites(JSON.parse(savedFavorites));
-    }
-  }, []);
+	const iconMap = {
+		Shield: Shield,
+		School: School,
+		Briefcase: Briefcase,
+		Building2: Building2,
+		Landmark: Landmark,
+		Scale: Scale,
+	};
 
-  const toggleFavorite = (title) => {
-    const newFavorites = favorites.includes(title)
-      ? favorites.filter(fav => fav !== title)
-      : [...favorites, title];
-    setFavorites(newFavorites);
-    localStorage.setItem('concursos_favorites', JSON.stringify(newFavorites));
-  };
+	const renderIcon = (iconName) => {
+		const IconComponent = iconMap[iconName];
+		if (!IconComponent) return null;
+		return <IconComponent className="h-6 w-6" />;
+	};
 
-  const categories = [
-    { id: 'todos', label: 'Todos' },
-    { id: 'militares', label: 'Militares' },
-    { id: 'bancarios', label: 'Bancários' },
-    { id: 'federais', label: 'Federais' },
-    { id: 'estaduais', label: 'Estaduais' }
-  ];
+	useEffect(() => {
+		const savedFavorites = localStorage.getItem('concursos_favorites');
+		if (savedFavorites) {
+			setFavorites(JSON.parse(savedFavorites));
+		}
+	}, []);
 
-  const filterItems = (items) => {
-    return items.filter(item => {
-      const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          item.description.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = selectedCategory === 'todos' || item.category === selectedCategory;
-      return matchesSearch && matchesCategory;
-    });
-  };
+	useEffect(() => {
+		// Simulate loading user role
+		const timer = setTimeout(() => {
+			setIsAuthorized(true);
+		}, 500);
 
-  return (
-    <div className="min-h-screen bg-gray-50 ">
-      <div className="container mx-auto p-4 md:p-6">
-        <div className="mx-auto">
-          <div className="flex flex-col items-center mb-6 bg-white rounded-lg shadow-lg p-4">
-            <Logo className="h-9 w-9" variant="icon" />
-            <h1 className="mt-4 text-2xl font-bold tracking-tight">Concursos Públicos</h1>
-            <p className="mt-2 text-center">Acompanhe as principais oportunidades de carreira pública</p>
-          </div>
+		return () => clearTimeout(timer);
+	}, []);
 
-          <div className="mb-6 space-y-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-              <Input
-                type="text"
-                placeholder="Buscar concursos..."
-                className="pl-10 w-full"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
+	useEffect(() => {
+		const fetchConcursos = async () => {
+			setIsLoading(true);
+			setError(null);
+			try {
+				const token = Cookies.get('token');
+				if (!token) throw new Error('Token não encontrado');
 
-            <div className="flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <Button
-                  key={category.id}
-                  variant={selectedCategory === category.id ? "default" : "outline"}
-                  className="text-sm"
-                  onClick={() => setSelectedCategory(category.id)}
-                >
-                  {category.label}
-                </Button>
-              ))}
-            </div>
-          </div>
+				console.log('Buscando lista de concursos');
+				const response = await fetch('http://localhost:3000/contestsEntrace/contests', {
+					method: 'GET',
+					headers: {
+						Authorization: `Bearer ${token}`,
+						'Content-Type': 'application/json',
+					},
+				});
 
-          <div className="grid  grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-          {filterItems(concursos).map((concurso) => (
-              <Card
-                key={concurso.title}
-                className="hover:shadow-xl transition-all duration-300 border-0 bg-white h-[300px] w-full"
-              >
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <div className={`p-3 rounded-lg ${concurso.color} text-white`}>
-                      <concurso.icon className="h-6 w-6" />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => toggleFavorite(concurso.title)}
-                        className="text-gray-400 hover:text-yellow-500 transition-colors"
-                      >
-                        {favorites.includes(concurso.title) ? (
-                          <Star className="h-5 w-5 fill-yellow-500 text-yellow-500" />
-                        ) : (
-                          <StarOff className="h-5 w-5" />
-                        )}
-                      </button>
-                      <div className="flex items-center text-sm text-gray-500">
-                        <Calendar className="h-4 w-4 mr-1" />
-                        {concurso.date}
-                      </div>
-                    </div>
-                  </div>
-                  <CardTitle className="text-xl mt-4 h-[32px] line-clamp-1">{concurso.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 mb-6 h-[48px] line-clamp-2">{concurso.description}</p>
-                  <Button
-                    className="w-full bg-[#133D86] hover:bg-[#0e2a5c] transition-colors duration-300"
-                    onClick={() => window.open(concurso.link, '_blank')}
-                  >
-                    Acessar Site Oficial
-                    <ExternalLink className="ml-2 h-4 w-4" />
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-} 
+				if (!response.ok) {
+					const errorData = await response.json();
+					throw new Error(errorData.error || 'Erro ao buscar lista de concursos');
+				}
+
+				const data = await response.json();
+				console.log('Lista de concursos recebida:', data);
+
+				// Transformar os dados para o formato esperado pelo componente
+				const formattedConcursos = data.map(concurso => ({
+					...concurso,
+					id: concurso.id,
+					category: concurso.type, // Mapear type para category para compatibilidade com o filtro
+					date: new Date(concurso.date).toLocaleDateString('pt-BR') // Formatar data
+				}));
+
+				setConcursos(formattedConcursos);
+			} catch (err) {
+				console.error('Erro ao buscar concursos:', err);
+				setError(err.message);
+				toast.error(err.message);
+			} finally {
+				setIsLoading(false);
+			}
+		};
+
+		fetchConcursos();
+	}, []);
+
+	const toggleFavorite = (title) => {
+		const newFavorites = favorites.includes(title)
+			? favorites.filter((fav) => fav !== title)
+			: [...favorites, title];
+		setFavorites(newFavorites);
+		localStorage.setItem('concursos_favorites', JSON.stringify(newFavorites));
+	};
+
+	const categories = [
+		{ id: 'todos', label: 'Todos' },
+		{ id: 'militares', label: 'Militares' },
+		{ id: 'bancarios', label: 'Bancários' },
+		{ id: 'federais', label: 'Federais' },
+		{ id: 'estaduais', label: 'Estaduais' },
+	];
+
+	const CreateConcursoModal = () => {
+		const [isSubmitting, setIsSubmitting] = useState(false);
+		const contests = z.object({
+			title: z.string().min(1, { message: 'Title is required' }),
+			link: z.string().url({ message: 'Invalid URL' }),
+			type: z.string().min(1, { message: 'Type is required' }),
+			icon: z.string().min(1, { message: 'Icon is required' }),
+			color: z.string().min(1, { message: 'Color is required' }),
+			description: z.string().min(1, { message: 'Description is required' }),
+			date: z.coerce.date({ message: 'Invalid date' }),
+		});
+
+		const form = useForm({
+			resolver: zodResolver(contests),
+			defaultValues: {
+				title: '',
+				link: '',
+				type: '',
+				icon: '',
+				color: '',
+				description: '',
+				date: '',
+			},
+		});
+
+		const onSubmit = async (formData) => {
+			setIsSubmitting(true);
+
+			try {
+				const token = Cookies.get('token');
+				if (!token) {
+					throw new Error('Token não encontrado');
+				}
+
+				// Preparar dados do concurso para envio
+				const concursoData = {
+					title: formData.title,
+					link: formData.link,
+					type: formData.type,
+					icon: formData.icon,
+					color: formData.color,
+					description: formData.description,
+					date: formData.date,
+				};
+
+				console.log('Enviando dados do concurso:', concursoData);
+
+				// Enviar dados do concurso para o backend
+				const response = await fetch('http://localhost:3000/contestsEntrace/contests', {
+					method: 'POST',
+					headers: {
+						Authorization: `Bearer ${token}`,
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify(concursoData),
+				});
+
+				if (!response.ok) {
+					throw new Error(`Erro HTTP: ${response.status}`);
+				}
+
+				const result = await response.json();
+				console.log('Concurso criado:', result);
+
+				// Mostrar mensagem de sucesso
+				toast.success('Concurso criado com sucesso!');
+				window.location.reload();
+				setIsCreateConcursoModalOpen(false);
+				form.reset();
+			} catch (error) {
+				console.error('Erro ao criar concurso:', error);
+				toast.error('Erro ao criar concurso. Tente novamente.');
+			} finally {
+				setIsSubmitting(false);
+			}
+		};
+
+		return (
+			<>
+				<Dialog open={isCreateConcursoModalOpen} onOpenChange={setIsCreateConcursoModalOpen}>
+					<DialogContent className="sm:max-w-[425px]">
+						<DialogHeader>
+							<DialogTitle>Novo Concurso</DialogTitle>
+						</DialogHeader>
+						<Form {...form}>
+							<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+								<BaseFormField
+									control={form.control}
+									name="title"
+									label="Título do Concurso"
+									placeholder="Título do Concurso"
+								/>
+								<BaseFormField
+									control={form.control}
+									name="link"
+									label="Link do Concurso"
+									placeholder="https://..."
+								/>
+								<SelectFormField
+									control={form.control}
+									name="type"
+									label="Categoria"
+									options={CONCURSO_CATEGORIES}
+									placeholder="Selecione a categoria"
+								/>
+								<BaseFormField
+									control={form.control}
+									name="date"
+									label="Data do Concurso"
+									type="date"
+								/>
+								<IconSelector
+									control={form.control}
+									name="icon"
+									label="Ícone"
+									options={ICON_OPTIONS.concursos}
+									form={form}
+								/>
+								
+								<BaseFormField
+									control={form.control}
+									name="description"
+									label="Descrição"
+									placeholder="Descrição do concurso"
+								/>
+
+								<DialogFooter>
+									<Button
+										type="button"
+										variant="outline"
+										onClick={() => {
+											setIsCreateConcursoModalOpen(false);
+											form.reset();
+										}}
+										disabled={isSubmitting}
+									>
+										Cancelar
+									</Button>
+									<Button type="submit" disabled={isSubmitting}>
+										{isSubmitting ? 'Cadastrando...' : 'Cadastrar Concurso'}
+									</Button>
+								</DialogFooter>
+							</form>
+						</Form>
+					</DialogContent>
+				</Dialog>
+			</>
+		);
+	};
+
+	const filterItems = (items) => {
+		return items.filter((item) => {
+			const matchesSearch =
+				item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+				item.description.toLowerCase().includes(searchTerm.toLowerCase());
+			const matchesCategory = selectedCategory === 'todos' || item.category === selectedCategory;
+			return matchesSearch && matchesCategory;
+		});
+	};
+
+	const handleDeleteConcurso = async (concurso) => {
+		setConcursoToDelete(concurso);
+		setDeleteDialogOpen(true);
+	};
+
+	const confirmDelete = async () => {
+		try {
+			const token = Cookies.get('token');
+			if (!token) throw new Error('Token não encontrado');
+
+			const response = await fetch(`http://localhost:3000/contestsEntrace/contests/${concursoToDelete.id}`, {
+				method: 'DELETE',
+				headers: {
+					Authorization: `Bearer ${token}`,
+					'Content-Type': 'application/json',
+				},
+			});
+
+			if (!response.ok) {
+				throw new Error('Erro ao deletar concurso');
+			}
+
+			setConcursos(prev => prev.filter(c => c.id !== concursoToDelete.id));
+			toast.success('Concurso deletado com sucesso!');
+		} catch (error) {
+			console.error('Erro ao deletar concurso:', error);
+			toast.error('Erro ao deletar concurso. Tente novamente.');
+		} finally {
+			setDeleteDialogOpen(false);
+			setConcursoToDelete(null);
+		}
+	};
+
+	if (isLoading) {
+		return <PageLoader />;
+	}
+
+	return (
+		<>
+			<div className="min-h-screen bg-gray-50 ">
+				<div className="container mx-auto p-4 md:p-6">
+					<div className="mx-auto">
+						<div className="flex flex-col items-center mb-6 bg-white rounded-lg shadow-lg p-4">
+							<Logo className="h-9 w-9" variant="icon" />
+							<h1 className="mt-4 text-2xl font-bold tracking-tight">Concursos Públicos</h1>
+							<p className="mt-2 text-center">
+								Acompanhe as principais oportunidades de carreira pública
+							</p>
+						</div>
+						{isAuthorized && (userRole === 'admin' || userRole === 'teacher') && (
+							<Button onClick={() => setIsCreateConcursoModalOpen(true)} className="mb-4">
+								<Plus className="h-4 w-4 mr-2 " />
+								Novo Concurso
+							</Button>
+						)}
+						<div className="mb-6 space-y-4">
+							<div className="relative">
+								<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+								<Input
+									type="text"
+									placeholder="Buscar concursos..."
+									className="pl-10 w-full"
+									value={searchTerm}
+									onChange={(e) => setSearchTerm(e.target.value)}
+								/>
+							</div>
+
+							<div className="flex flex-wrap gap-2">
+								{categories.map((category) => (
+									<Button
+										key={category.id}
+										variant={selectedCategory === category.id ? 'default' : 'outline'}
+										className="text-sm"
+										onClick={() => setSelectedCategory(category.id)}
+									>
+										{category.label}
+									</Button>
+								))}
+							</div>
+						</div>
+
+						<div className="grid  grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+							{filterItems(concursos).map((concurso) => (
+								<Card
+									key={concurso.title}
+									className="hover:shadow-xl transition-all duration-300 border-0 bg-white h-[300px] w-full"
+								>
+									<CardHeader className="pb-2">
+										<div className="flex items-center justify-between">
+											<div className="p-3 rounded-lg text-white" style={{ backgroundColor: concurso.color }}>
+												{renderIcon(concurso.icon)}
+											</div>
+											<div className="flex items-center gap-2">
+												<button
+													onClick={() => toggleFavorite(concurso.title)}
+													className="text-gray-400 hover:text-yellow-500 transition-colors"
+												>
+													{favorites.includes(concurso.title) ? (
+														<Star className="h-5 w-5 fill-yellow-500 text-yellow-500" />
+													) : (
+														<StarOff className="h-5 w-5" />
+													)}
+												</button>
+												<div className="flex items-center text-sm text-gray-500">
+													<Calendar className="h-4 w-4 mr-1" />
+													{concurso.date}
+												</div>
+												{(userRole === 'admin' || userRole === 'teacher') && (
+													<button
+														onClick={() => handleDeleteConcurso(concurso)}
+														className="text-gray-400 hover:text-red-500 transition-colors ml-2"
+													>
+														<Trash2 className="h-5 w-5" />
+													</button>
+												)}
+											</div>
+										</div>
+										<CardTitle className="text-xl mt-4 h-[32px] line-clamp-1">
+											{concurso.title}
+										</CardTitle>
+									</CardHeader>
+									<CardContent>
+										<p className="text-gray-600 mb-6 h-[48px] line-clamp-2">
+											{concurso.description}
+										</p>
+										<Button
+											className="w-full bg-[#133D86] hover:bg-[#0e2a5c] transition-colors duration-300"
+											onClick={() => window.open(concurso.link, '_blank')}
+										>
+											Acessar Site Oficial
+											<ExternalLink className="ml-2 h-4 w-4" />
+										</Button>
+									</CardContent>
+								</Card>
+							))}
+						</div>
+					</div>
+				</div>
+			</div>
+			<CreateConcursoModal />
+			<Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+				<DialogContent className="sm:max-w-[425px]">
+					<DialogHeader>
+						<DialogTitle>Deletar Concurso</DialogTitle>
+					</DialogHeader>
+					<DialogDescription>
+						Você tem certeza de que deseja deletar este concurso?
+					</DialogDescription>
+					<DialogFooter>
+						<Button
+							type="button"
+							variant="outline"
+							onClick={() => setDeleteDialogOpen(false)}
+						>
+							Cancelar
+						</Button>
+						<Button
+							type="button"
+							onClick={confirmDelete}
+							className="bg-red-500 hover:bg-red-600"
+						>
+							Deletar
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
+		</>
+	);
+}
