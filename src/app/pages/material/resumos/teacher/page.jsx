@@ -23,7 +23,7 @@ export default function TeacherResumosPage() {
                     return;
                 }
 
-                const response = await fetch('https://api-studdy.onrender.com/teacher/resumes', {
+                const response = await fetch('http://localhost:3000/teacher/resumes', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -54,7 +54,7 @@ export default function TeacherResumosPage() {
                 return;
             }
 
-            const response = await fetch(`https://api-studdy.onrender.com/teacher/resumes/${resumoId}`, {
+            const response = await fetch(`http://localhost:3000/teacher/resumes/${resumoId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -223,4 +223,4 @@ export default function TeacherResumosPage() {
             </div>
         </div>
     );
-}
+} 

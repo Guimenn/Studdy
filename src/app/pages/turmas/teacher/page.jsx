@@ -1,4 +1,11 @@
 'use client';
+
+/**
+ * Página de Simulados do Professor
+ * Permite que professores visualizem e gerenciem suas turmas
+ * Inclui navegação para turmas específicas e criação de novas turmas
+ */
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +17,10 @@ import { PageLoader } from "@/components/ui/loader";
 import Cookies from 'js-cookie';
 import { toast } from 'sonner';
 
+/**
+ * Componente da página de simulados do professor
+ * Restrito apenas para usuários com role de teacher
+ */
 export default function TeacherSimuladosPage() {
     const { userRole } = useUser();
     const router = useRouter();
@@ -33,7 +44,7 @@ export default function TeacherSimuladosPage() {
                 return;
             }
 
-            const response = await fetch('https://api-studdy.onrender.com/teacher/classes', {
+            const response = await fetch('http://localhost:3000/teacher/classes', {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'

@@ -5,6 +5,10 @@ import { useRouter, usePathname } from 'next/navigation';
 import Cookies from 'js-cookie';
 import { publicRoutes } from '@/config/routes';
 
+/**
+ * ProtectedRoute - Componente de proteção de rotas
+ * Verifica autenticação e redireciona usuários não logados
+ */
 export default function ProtectedRoute({ children }) {
     const router = useRouter();
     const pathname = usePathname();
@@ -22,4 +26,4 @@ export default function ProtectedRoute({ children }) {
     }, [router, pathname]);
 
     return children;
-} 
+}

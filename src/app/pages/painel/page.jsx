@@ -1,5 +1,11 @@
 'use client';
 
+/**
+ * Página do Painel Principal (Dashboard)
+ * Exibe informações personalizadas baseadas no papel do usuário
+ * Inclui estatísticas, atividades recentes e navegação rápida
+ */
+
 import { FileText, CheckCircle, LineChart, Users, Bell, Award, BookOpen, Calendar, Clock, Target, ExternalLink, GraduationCap, Frame } from 'lucide-react';
 import Image from 'next/image';
 import { useUser } from '@/contexts/UserContext';
@@ -95,7 +101,7 @@ export default function Dashboard() {
 				setLoading(true);
 
 				// Buscar dados do usuário
-				const userResponse = await fetch(`https://api-studdy.onrender.com/user/${userId}`, {
+				const userResponse = await fetch(`http://localhost:3000/user/${userId}`, {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -112,13 +118,13 @@ export default function Dashboard() {
 				let endpoint = '';
 				switch (userRole) {
 					case 'student':
-						endpoint = 'https://api-studdy.onrender.com/student/status';
+						endpoint = 'http://localhost:3000/student/status';
 						break;
 					case 'teacher':
-						endpoint = 'https://api-studdy.onrender.com/teacher/status';
+						endpoint = 'http://localhost:3000/teacher/status';
 						break;
 					case 'admin':
-						endpoint = 'https://api-studdy.onrender.com/admin/status';
+						endpoint = 'http://localhost:3000/admin/status';
 						break;
 					default:
 						setLoading(false);
@@ -685,7 +691,7 @@ export default function Dashboard() {
 												variant="default"
 												size="lg"
 												className="flex items-center gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5"
-												onClick={() => router.push('/simulados')}
+												onClick={() => router.push('/pages/simulados')}
 											>
 												<ExternalLink className="h-4 w-4" />
 												Ver todos os simulados
@@ -831,7 +837,7 @@ export default function Dashboard() {
 										<CardContent className="p-6">
 											<div className="flex items-center gap-4">
 												<div className="p-3 bg-primary/10 rounded-lg">
-													<Frame className="w-6 h-6 text-primary" />
+													<Users className="w-6 h-6 text-primary" />
 												</div>
 												<div>
 													<h3 className="font-medium text-lg">Turmas</h3>
@@ -848,26 +854,6 @@ export default function Dashboard() {
 										</CardContent>
 									</Card>
 
-									<Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-										<CardContent className="p-6">
-											<div className="flex items-center gap-4">
-												<div className="p-3 bg-primary/10 rounded-lg">
-													<BookOpen className="w-6 h-6 text-primary" />
-												</div>
-												<div>
-													<h3 className="font-medium text-lg">Material</h3>
-													<p className="text-sm text-gray-500">Gerenciar materiais</p>
-												</div>
-											</div>
-											<Button
-												variant="ghost"
-												className="w-full mt-4"
-												onClick={() => router.push('/pages/material')}
-											>
-												Acessar
-											</Button>
-										</CardContent>
-									</Card>
 								</div>
 							</div>
 						)}

@@ -1,5 +1,11 @@
 'use client';
 
+/**
+ * Página de Nova Senha
+ * Permite que usuários definam uma nova senha após verificação
+ * Inclui validação de senha forte e confirmação
+ */
+
 import Logo from '@/components/ui/logo';
 import { Button } from '@/components/ui/button';
 import {
@@ -18,6 +24,9 @@ import { z } from 'zod';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
+/**
+ * Schema de validação para nova senha
+ */
 const formSchema = z
     .object({
         newpassword: z
@@ -85,7 +94,7 @@ const PassRecoveryNewPass = () => {
                 passwordLength: data.newpassword.length
             });
 
-            const response = await fetch('https://api-studdy.onrender.com/login/new-password', {
+            const response = await fetch('http://localhost:3000/login/new-password', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

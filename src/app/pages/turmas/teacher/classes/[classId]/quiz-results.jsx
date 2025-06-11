@@ -24,7 +24,7 @@ export default function QuizResults({ classId, quizId }) {
                 return;
             }
 
-            const response = await fetch(`https://api-studdy.onrender.com/teacher/classes/${classId}/quizzes/${quizId}/results`, {
+            const response = await fetch(`http://localhost:3000/teacher/classes/${classId}/quizzes/${quizId}/results`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -166,4 +166,4 @@ export default function QuizResults({ classId, quizId }) {
             </div>
         </div>
     );
-}
+} 

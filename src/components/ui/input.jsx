@@ -2,6 +2,17 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Componente Input reutilizável
+ * Campo de entrada estilizado com suporte a diferentes tipos e estados
+ * Inclui estilos para foco, erro e acessibilidade
+ */
+
+/**
+ * Componente de campo de entrada
+ * @param {string} className - Classes CSS adicionais
+ * @param {string} type - Tipo do input (text, email, password, etc.)
+ */
 function Input({
   className,
   type,

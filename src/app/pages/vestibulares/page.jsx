@@ -1,5 +1,11 @@
 'use client';
 
+/**
+ * Página de Vestibulares
+ * Permite visualizar, criar, editar e excluir vestibulares
+ * Inclui funcionalidades de busca, filtros e favoritos para vestibulares
+ */
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Logo from "@/components/ui/logo";
@@ -89,7 +95,7 @@ export default function VestibularesPage() {
         if (!token) throw new Error('Token não encontrado');
 
         console.log('Buscando lista de vestibulares');
-        const response = await fetch('https://api-studdy.onrender.com/contestsEntrace/entrance-exams', {
+        const response = await fetch('http://localhost:3000/contestsEntrace/entrance-exams', {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,
@@ -205,7 +211,7 @@ export default function VestibularesPage() {
 
         // Enviar dados do vestibular para o backend
         const response = await fetch(
-          'https://api-studdy.onrender.com/contestsEntrace/entrance-exams',
+          'http://localhost:3000/contestsEntrace/entrance-exams',
           {
             method: 'POST',
             headers: {
@@ -323,7 +329,7 @@ export default function VestibularesPage() {
       const token = Cookies.get('token');
       if (!token) throw new Error('Token não encontrado');
 
-      const response = await fetch(`https://api-studdy.onrender.com/contestsEntrace/entrance-exams/${vestibularToDelete.id}`, {
+      const response = await fetch(`http://localhost:3000/contestsEntrace/entrance-exams/${vestibularToDelete.id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,

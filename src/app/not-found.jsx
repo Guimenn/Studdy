@@ -1,10 +1,19 @@
 'use client';
 
+/**
+ * Página 404 - Não Encontrado
+ * Exibe uma página de erro personalizada quando uma rota não é encontrada
+ * Inclui animações e navegação de volta para o painel
+ */
+
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import Logo from '@/components/ui/logo';
 import { useEffect, useState } from 'react';
 
+/**
+ * Componente da página 404
+ */
 export default function NotFound() {
 
     return (

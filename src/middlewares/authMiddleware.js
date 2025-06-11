@@ -1,5 +1,16 @@
 import jwt from 'jsonwebtoken';
 
+/**
+ * Middleware de autenticação JWT para Next.js
+ * Verifica e valida tokens de acesso em requisições API
+ */
+
+/**
+ * Middleware que verifica a autenticação do usuário via JWT
+ * @param {Object} req - Objeto de requisição
+ * @param {Object} res - Objeto de resposta
+ * @param {Function} next - Função para continuar o middleware
+ */
 export const authMiddleware = (req, res, next) => {
     try {
         const token = req.headers.authorization?.split(' ')[1];
@@ -21,4 +32,4 @@ export const authMiddleware = (req, res, next) => {
             message: 'Token inválido'
         });
     }
-}; 
+};

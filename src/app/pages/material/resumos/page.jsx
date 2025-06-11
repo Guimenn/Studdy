@@ -1,5 +1,11 @@
 'use client';
 
+/**
+ * Página de Resumos
+ * Permite visualizar resumos de matérias disponíveis para o estudante
+ * Inclui funcionalidades de busca e visualização de conteúdo dos resumos
+ */
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,6 +13,10 @@ import { BookOpen, Search, Calendar, User, GraduationCap, FileText } from 'lucid
 import Cookies from 'js-cookie';
 import { toast } from 'sonner';
 
+/**
+ * Componente da página de resumos
+ * Exibe lista de resumos com busca e visualização
+ */
 export default function ResumosPage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedResumo, setSelectedResumo] = useState(null);
@@ -22,7 +32,7 @@ export default function ResumosPage() {
                     return;
                 }
 
-                const response = await fetch('https://api-studdy.onrender.com/student/resumes', {
+                const response = await fetch('http://localhost:3000/student/resumes', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

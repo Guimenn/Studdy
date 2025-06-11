@@ -2,6 +2,16 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Componentes de Card reutilizáveis
+ * Fornece estrutura consistente para exibição de conteúdo em cartões
+ * Inclui Card, CardHeader, CardTitle, CardDescription, CardContent e CardFooter
+ */
+
+/**
+ * Componente Card principal
+ * @param {string} className - Classes CSS adicionais
+ */
 function Card({
   className,
   ...props

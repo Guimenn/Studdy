@@ -1,5 +1,11 @@
 'use client';
 
+/**
+ * Layout principal da aplicação Studdy
+ * Gerencia autenticação, roteamento protegido e estrutura global
+ * Inclui sidebar, providers de contexto e proteção de rotas baseada em papéis
+ */
+
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
@@ -15,7 +21,10 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
 const inter = Inter({ subsets: ["latin"] });
 
-// Define protected routes and their required roles
+/**
+ * Configuração de rotas protegidas por papel de usuário
+ * Define quais rotas cada tipo de usuário pode acessar
+ */
 const protectedRoutes = {
 	admin: [
 		'/pages/administracao',
@@ -52,96 +61,84 @@ const protectedRoutes = {
 		'/pages/material/apostilas',
 		'/pages/concursos',
 		'/pages/vestibulares',
-		'/pages/turmas',
 		'/pages/profile',
 	],
 };
 
-function RootLayoutContent({ children }) {
+/**
+ * LayoutContent - Gerencia renderização da sidebar e proteção de rotas
+ * Controla quando mostrar sidebar baseado na rota atual
+ */
+function LayoutContent({ children }) {
 	const pathname = usePathname();
 	const router = useRouter();
 	const { userRole } = useUser();
 	const [isLoading, setIsLoading] = useState(true);
-	const [isAuthorized, setIsAuthorized] = useState(false);
 
 	useEffect(() => {
-		// Simula um pequeno delay para carregar a role
 		const timer = setTimeout(() => {
-			setIsAuthorized(true);
 			setIsLoading(false);
-		}, 500);
+		}, 1000);
 
 		return () => clearTimeout(timer);
-	}, [pathname, userRole]);
+	}, []);
+
+	/**
+	 * Verifica se usuário tem acesso à rota atual
+	 */
+	const hasAccess = (userRole, pathname) => {
+		if (!userRole) return false;
+		
+		const allowedRoutes = protectedRoutes[userRole.toLowerCase()] || [];
+		return allowedRoutes.some(route => pathname.startsWith(route));
+	};
+
+	const noSidebarRoutes = ['/pages/login', '/pages/recovery'];
+	const shouldShowSidebar = !noSidebarRoutes.some(route => pathname.startsWith(route));
 
 	if (isLoading) {
-		return <Loader />;
+		return <PageLoader />;
 	}
 
-	// Se estiver na página de login ou recovery, não mostra a sidebar
-	if (pathname === '/pages/login' || pathname.startsWith('/pages/recovery')) {
+	if (shouldShowSidebar) {
 		return (
-			<div className="flex h-screen w-screen bg-slate-100 min-h-screen min-w-screen">
-				<main className="flex-1 overflow-y-auto">
-					{children}
-				</main>
-			</div>
-		);
-	}
-
-	// Verifica se a rota atual existe nas rotas protegidas
-	const allProtectedRoutes = [
-		...protectedRoutes.admin,
-		...protectedRoutes.teacher,
-		...protectedRoutes.student,
-		'/pages/login',
-		'/pages/recovery',
-		'/pages/not-found'
-	];
-
-	// Se a rota não existir nas rotas protegidas, não mostra a sidebar
-	const isProtectedRoute = allProtectedRoutes.some(route => 
-		pathname === route || 
-		pathname.startsWith(route + '/') ||
-		pathname.startsWith('/pages/turmas/')
-	);
-
-	if (!isProtectedRoute) {
-		return (
-			<div className="flex h-screen w-screen bg-slate-100 min-h-screen min-w-screen">
-				<main className="flex-1 overflow-y-auto">
-					{children}
-				</main>
-			</div>
+			<SidebarProvider>
+				<div className="flex h-screen w-full">
+					<AppSidebar />
+					<main className="flex-1 overflow-auto">
+						<ProtectedRoute>
+							{children}
+						</ProtectedRoute>
+					</main>
+				</div>
+				<Toaster position="top-right" />
+			</SidebarProvider>
 		);
 	}
 
 	return (
-		<div className="flex h-screen w-screen bg-slate-100 min-h-screen min-w-screen">
-			<AppSidebar />
-			<main className="flex-1 overflow-y-auto">
-				{children}
-			</main>
+		<div className="h-screen w-full">
+			{children}
+			<Toaster position="top-right" />
 		</div>
 	);
 }
 
+/**
+ * RootLayout - Layout principal da aplicação
+ * Configura providers globais e estrutura base
+ */
 export default function RootLayout({ children }) {
 	return (
 		<html lang="pt-BR">
 			<head>
 				<title>Studdy - Plataforma de Estudos</title>
-				<meta name="description" content="Plataforma de estudos para alunos e professores" />
+				<meta name="description" content="Plataforma completa para estudos e preparação para concursos e vestibulares" />
 			</head>
 			<body className={inter.className}>
 				<UserProvider>
-					<ProtectedRoute>
-						<SidebarProvider>
-							<RootLayoutContent>{children}</RootLayoutContent>
-						</SidebarProvider>
-					</ProtectedRoute>
+					<LayoutContent>{children}</LayoutContent>
 				</UserProvider>
-				<Toaster richColors />
 			</body>
 		</html>
 	);

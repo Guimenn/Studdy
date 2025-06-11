@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Logo from "@/components/ui/logo";
-import { Search, Plus, Calculator, Atom, Pen, ScrollText, Trash2, Users, BookOpen, BarChart2, Filter, PlayCircle, Clock, CheckCircle, Eye } from "lucide-react";
+import { Search, Plus, Calculator, Atom, Pen, ScrollText, Trash2, Users, BookOpen, BarChart2, Filter, PlayCircle, Clock, CheckCircle, Eye, BarChart3, Info } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/contexts/UserContext";
@@ -22,12 +22,21 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import QuizResults from './quiz-results';
+import ClassStatistics from "./class-statistics";
+import StudentPerformance from './student-performance';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Label } from "@/components/ui/label";
 
 const statusFilters = [
     { id: 'todos', label: 'Todos', icon: BookOpen },
     { id: 'public', label: 'Público', icon: Eye },
     { id: 'draft', label: 'Rascunho', icon: Pen }
 ];
+const SHIFT_OPTIONS = [
+    { value: 'Morning', label: 'Manhã' },
+    { value: 'Afternoon', label: 'Tarde' },
+    { value: 'Night', label: 'Noite' }
+]
 
 export default function ClassDetailsClient({ classId }) {
     const router = useRouter();
@@ -39,6 +48,7 @@ export default function ClassDetailsClient({ classId }) {
     const [quizToDelete, setQuizToDelete] = useState(null);
     const [activeTab, setActiveTab] = useState("simulados");
     const [selectedQuiz, setSelectedQuiz] = useState(null);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         if (userRole !== 'teacher') {
@@ -49,16 +59,13 @@ export default function ClassDetailsClient({ classId }) {
     }, [userRole, classId]);
 
     const fetchClassData = async () => {
-        setLoading(true);
         try {
             const token = Cookies.get('token');
             if (!token) {
-                toast.error('Token não encontrado');
-                return;
+                throw new Error('Token não encontrado');
             }
 
-            const response = await fetch(`https://api-studdy.onrender.com/teacher/classes/${classId}`, {
-                method: 'GET',
+            const response = await fetch(`http://localhost:3000/teacher/classes/${classId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -66,15 +73,15 @@ export default function ClassDetailsClient({ classId }) {
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Erro ao carregar dados da turma');
+                throw new Error('Erro ao carregar dados da turma');
             }
 
             const data = await response.json();
+            console.log('Dados da turma:', data); // Para debug
             setClassData(data);
         } catch (error) {
             console.error('Erro ao carregar dados da turma:', error);
-            toast.error(error.message || 'Erro ao carregar dados da turma');
+            setError(error.message);
         } finally {
             setLoading(false);
         }
@@ -123,7 +130,7 @@ export default function ClassDetailsClient({ classId }) {
                     throw new Error('Token não encontrado');
                 }
 
-                const response = await fetch(`https://api-studdy.onrender.com/teacher/quiz/${quiz.id}`, {
+                const response = await fetch(`http://localhost:3000/teacher/quiz/${quiz.id}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -174,13 +181,17 @@ export default function ClassDetailsClient({ classId }) {
                         </div>
                     ) : (
                         <Tabs defaultValue="simulados" className="w-full" onValueChange={setActiveTab}>
-                            <TabsList className="grid w-full grid-cols-2 mb-8">
+                            <TabsList className="grid w-full grid-cols-3">
                                 <TabsTrigger value="simulados" className="flex items-center gap-2">
                                     <BookOpen className="h-4 w-4" />
                                     Simulados
                                 </TabsTrigger>
-                                <TabsTrigger value="informacoes" className="flex items-center gap-2">
+                                <TabsTrigger value="desempenho" className="flex items-center gap-2">
                                     <Users className="h-4 w-4" />
+                                    Desempenho
+                                </TabsTrigger>
+                                <TabsTrigger value="informacoes" className="flex items-center gap-2">
+                                    <Info className="h-4 w-4" />
                                     Informações
                                 </TabsTrigger>
                             </TabsList>
@@ -329,104 +340,137 @@ export default function ClassDetailsClient({ classId }) {
                                 </div>
                             </TabsContent>
 
+                            <TabsContent value="desempenho">
+                                <StudentPerformance classId={classId} />
+                            </TabsContent>
+
                             <TabsContent value="informacoes">
                                 <div className="space-y-8">
-                                    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-                                        <div className="flex items-center gap-3 mb-6">
-                                            <div className="p-2 bg-blue-100 rounded-lg">
-                                                <Users className="h-6 w-6 text-[#133D86]" />
+                                    <Card className="border-2 pt-0 border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300">
+                                        <CardHeader className="bg-gradient-to-r pt-1 from-[#133D86] to-[#1e56b3] text-white rounded-t-xl">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-2">
+                                                    <BookOpen className="h-5 w-5" />
+                                                    <CardTitle>Informações da Turma</CardTitle>
+                                                </div>
                                             </div>
+                                        </CardHeader>
+                                        <CardContent className="p-6">
+                                            <div className="space-y-8">
+                                                {/* Detalhes da Turma */}
                                             <div>
-                                                <h2 className="text-xl font-semibold text-gray-800">Professores</h2>
-                                                <p className="text-sm text-gray-500">Professores responsáveis pela turma</p>
+                                                    <h3 className="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                                                        <Info className="h-5 w-5 text-[#133D86]" />
+                                                        Detalhes da Turma
+                                                    </h3>
+                                                    <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+                                                        <Table>
+                                                            <TableBody>
+                                                                <TableRow className="hover:bg-gray-50/50 border-b border-gray-100">
+                                                                    <TableCell className="font-medium w-1/3 bg-gray-50/80 text-gray-700 py-4 px-6">Nome</TableCell>
+                                                                    <TableCell className="text-gray-600 py-4 px-6">{classData?.name || 'Não informado'}</TableCell>
+                                                                </TableRow>
+                                                                <TableRow className="hover:bg-gray-50/50">
+                                                                    <TableCell className="font-medium bg-gray-50/80 text-gray-700 py-4 px-6">Curso</TableCell>
+                                                                    <TableCell className="text-gray-600 py-4 px-6">{classData?.course || 'Não informado'}</TableCell>
+                                                                </TableRow>
+                                                                <TableRow className="hover:bg-gray-50/50">
+                                                                    <TableCell className="font-medium bg-gray-50/80 text-gray-700 py-4 px-6">Turno</TableCell>
+                                                                    <TableCell className="text-gray-600 py-4 px-6">{classData?.shift ? SHIFT_OPTIONS.find(option => option.value === classData.shift)?.label : 'Não informado'}</TableCell>
+                                                                </TableRow>
+                                                               
+                                                                <TableRow className="hover:bg-gray-50/50">
+                                                                    <TableCell className="font-medium bg-gray-50/80 text-gray-700 py-4 px-6">Total de Alunos</TableCell>
+                                                                    <TableCell className="text-gray-600 py-4 px-6">{classData?.students?.length || 0}</TableCell>
+                                                                </TableRow>
+                                                            </TableBody>
+                                                        </Table>
                                             </div>
                                         </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            {classData.teachers?.map((teacher) => (
-                                                <div key={teacher.teacher_id} className="bg-gray-50 p-4 rounded-lg border border-gray-100 hover:border-[#133D86] transition-colors duration-300">
-                                                    <div className="flex items-start gap-4">
-                                                        <div className="p-2 bg-[#133D86] rounded-full text-white">
-                                                            <Users className="h-5 w-5" />
-                                                        </div>
-                                                        <div className="flex-1">
-                                                            <h3 className="font-medium text-gray-900">{teacher.teacher_name}</h3>
-                                                            <p className="text-sm text-gray-600">{teacher.teacher_email}</p>
-                                                            <div className="mt-3">
-                                                                <p className="text-sm font-medium text-gray-700 mb-1">Disciplinas:</p>
-                                                                <div className="flex flex-wrap gap-2">
-                                                                    {teacher.subjects.map(subject => (
-                                                                        <span key={subject.id} className="px-2 py-1 bg-blue-50 text-[#133D86] rounded-full text-xs font-medium">
-                                                                            {subject.name}
-                                                                        </span>
+
+                                                {/* Lista de Alunos */}
+                                                <div className="pt-6 border-t border-gray-200">
+                                                    <h3 className="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                                                        <Users className="h-5 w-5 text-[#133D86]" />
+                                                        Alunos Matriculados
+                                                    </h3>
+                                                    {classData?.students?.length > 0 ? (
+                                                        <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+                                                            <Table>
+                                                                <TableHeader>
+                                                                    <TableRow className="bg-gray-50/80 hover:bg-gray-50/80 border-b border-gray-200">
+                                                                        <TableHead className="text-gray-700 font-semibold py-4 px-6">Nome</TableHead>
+                                                                        <TableHead className="text-gray-700 font-semibold py-4 px-6">Email</TableHead>
+                                                                        <TableHead className="text-gray-700 font-semibold py-4 px-6">Matrícula</TableHead>
+                                                                    </TableRow>
+                                                                </TableHeader>
+                                                                <TableBody>
+                                                                    {classData.students.map((student, index) => (
+                                                                        <TableRow 
+                                                                            key={student.student_id} 
+                                                                            className={`hover:bg-gray-50/50 ${index !== classData.students.length - 1 ? 'border-b border-gray-100' : ''}`}
+                                                                        >
+                                                                            <TableCell className="text-gray-600 py-4 px-6">{student.name || 'Não informado'}</TableCell>
+                                                                            <TableCell className="text-gray-600 py-4 px-6">{student.email || 'Não informado'}</TableCell>
+                                                                            <TableCell className="text-gray-600 py-4 px-6">{student.enrollment || 'Não informado'}</TableCell>
+                                                                        </TableRow>
                                                                     ))}
+                                                                </TableBody>
+                                                            </Table>
                                                                 </div>
-                                                            </div>
+                                                    ) : (
+                                                        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-8 text-center text-gray-500">
+                                                            <Users className="h-10 w-10 mx-auto mb-3 text-gray-400" />
+                                                            <p className="text-lg">Nenhum aluno matriculado</p>
                                                         </div>
-                                                    </div>
+                                                    )}
                                                 </div>
-                                            ))}
-                                        </div>
-                                    </div>
 
-                                    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-                                        <div className="flex items-center gap-3 mb-6">
-                                            <div className="p-2 bg-green-100 rounded-lg">
-                                                <Users className="h-6 w-6 text-green-600" />
-                                            </div>
-                                            <div>
-                                                <h2 className="text-xl font-semibold text-gray-800">Alunos</h2>
-                                                <p className="text-sm text-gray-500">Alunos matriculados na turma</p>
-                                            </div>
-                                        </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                            {classData.students?.map((student) => (
-                                                <div key={student.student_id} className="bg-gray-50 p-4 rounded-lg border border-gray-100 hover:border-green-500 transition-colors duration-300">
-                                                    <div className="flex items-start gap-4">
-                                                        <div className="p-2 bg-green-500 rounded-full text-white">
-                                                            <Users className="h-5 w-5" />
+                                                {/* Matérias */}
+                                                <div className="pt-6 border-t border-gray-200">
+                                                    <h3 className="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                                                        <BookOpen className="h-5 w-5 text-[#133D86]" />
+                                                        Matérias
+                                                    </h3>
+                                                    {classData?.teachers?.[0]?.subjects?.length > 0 ? (
+                                                        <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+                                                            <Table>
+                                                                <TableHeader>
+                                                                    <TableRow className="bg-gray-50/80 hover:bg-gray-50/80 border-b border-gray-200">
+                                                                        <TableHead className="text-gray-700 font-semibold py-4 px-6">Nome</TableHead>
+                                                                        <TableHead className="text-gray-700 font-semibold py-4 px-6">Professor</TableHead>
+                                                                    </TableRow>
+                                                                </TableHeader>
+                                                                <TableBody>
+                                                                    {classData.teachers.map((teacher, teacherIndex) => (
+                                                                        teacher.subjects.map((subject, subjectIndex) => (
+                                                                            <TableRow 
+                                                                                key={subject.id} 
+                                                                                className={`hover:bg-gray-50/50 ${
+                                                                                    teacherIndex !== classData.teachers.length - 1 || 
+                                                                                    subjectIndex !== teacher.subjects.length - 1 
+                                                                                        ? 'border-b border-gray-100' 
+                                                                                        : ''
+                                                                                }`}
+                                                                            >
+                                                                                <TableCell className="text-gray-600 py-4 px-6">{subject.name}</TableCell>
+                                                                                <TableCell className="text-gray-600 py-4 px-6">{teacher.teacher_name}</TableCell>
+                                                                            </TableRow>
+                                                                        ))
+                                                                    ))}
+                                                                </TableBody>
+                                                            </Table>
                                                         </div>
-                                                        <div className="flex-1">
-                                                            <h3 className="font-medium text-gray-900">{student.name}</h3>
-                                                            <p className="text-sm text-gray-600">{student.email}</p>
-                                                            <div className="mt-2">
-                                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                                    Matrícula: {student.enrollment}
-                                                                </span>
-                                                            </div>
+                                                    ) : (
+                                                        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-8 text-center text-gray-500">
+                                                            <BookOpen className="h-10 w-10 mx-auto mb-3 text-gray-400" />
+                                                            <p className="text-lg">Nenhuma matéria cadastrada</p>
                                                         </div>
-                                                    </div>
+                                                    )}
                                                 </div>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-                                        <div className="flex items-center gap-3 mb-6">
-                                            <div className="p-2 bg-purple-100 rounded-lg">
-                                                <BookOpen className="h-6 w-6 text-purple-600" />
                                             </div>
-                                            <div>
-                                                <h2 className="text-xl font-semibold text-gray-800">Informações da Turma</h2>
-                                                <p className="text-sm text-gray-500">Detalhes gerais da turma</p>
-                                            </div>
-                                        </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                            <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
-                                                <h3 className="text-sm font-medium text-gray-500 mb-1">Nome da Turma</h3>
-                                                <p className="text-lg font-semibold text-gray-900">{classData.name}</p>
-                                            </div>
-                                            <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
-                                                <h3 className="text-sm font-medium text-gray-500 mb-1">Curso</h3>
-                                                <p className="text-lg font-semibold text-gray-900">{classData.course}</p>
-                                            </div>
-                                            <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
-                                                <h3 className="text-sm font-medium text-gray-500 mb-1">Turno</h3>
-                                                <p className="text-lg font-semibold text-gray-900">
-                                                    {classData.shift === 'Morning' ? 'Manhã' : classData.shift === 'Afternoon' ? 'Tarde' : 'Noite'}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
+                                        </CardContent>
+                                    </Card>
                                 </div>
                             </TabsContent>
                         </Tabs>

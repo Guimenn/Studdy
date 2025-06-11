@@ -2,6 +2,17 @@
 
 import { cn } from "@/lib/utils";
 
+/**
+ * Componentes de loading/carregamento
+ * Fornece indicadores visuais de carregamento em diferentes tamanhos
+ * Inclui loader padrão e loader de página completa
+ */
+
+/**
+ * Componente Loader básico
+ * @param {string} className - Classes CSS adicionais
+ * @param {string} size - Tamanho do loader (sm, default, lg)
+ */
 export function Loader({ className, size = "default" }) {
   const sizeClasses = {
     sm: "h-4 w-4",
@@ -30,4 +41,4 @@ export function PageLoader() {
       </div>
     </div>
   );
-} 
+}

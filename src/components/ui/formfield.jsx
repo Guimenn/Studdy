@@ -2,6 +2,8 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/comp
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { X } from "lucide-react";
 // Componentes de Formulário
 const BaseFormField = ({ control, name, label, type = "text", placeholder, ...props }) => (
     <FormField
@@ -111,4 +113,76 @@ const IconSelector = ({ control, name, label, options, form }) => (
         )}
     />
 );
-export { BaseFormField, SelectFormField, IconSelector };
+
+const MultiSelectFormField = ({ control, name, label, options, placeholder, disabled, maxSelections = 5 }) => (
+    <FormField
+        control={control}
+        name={name}
+        render={({ field }) => (
+            <FormItem>
+                <FormLabel>{label}</FormLabel>
+                <div className="space-y-2">
+                    <Select
+                        onValueChange={(value) => {
+                            const currentValues = field.value || [];
+                            if (currentValues.length < maxSelections) {
+                                if (!currentValues.includes(value)) {
+                                    field.onChange([...currentValues, value]);
+                                }
+                            }
+                        }}
+                        disabled={disabled || (field.value?.length || 0) >= maxSelections}
+                    >
+                        <FormControl>
+                            <SelectTrigger>
+                                <SelectValue placeholder={placeholder} />
+                            </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                            {options.map((option) => (
+                                <SelectItem 
+                                    key={option.value} 
+                                    value={option.value}
+                                    disabled={field.value?.includes(option.value)}
+                                >
+                                    {option.label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    <div className="flex flex-wrap gap-2">
+                        {field.value?.map((value) => {
+                            const option = options.find(opt => opt.value === value);
+                            return (
+                                <Badge 
+                                    key={value} 
+                                    variant="secondary"
+                                    className="flex items-center gap-1"
+                                >
+                                    {option?.label}
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            field.onChange(field.value.filter(v => v !== value));
+                                        }}
+                                        className="ml-1 hover:bg-gray-200 rounded-full p-0.5"
+                                    >
+                                        <X className="h-3 w-3" />
+                                    </button>
+                                </Badge>
+                            );
+                        })}
+                    </div>
+                    {(field.value?.length || 0) >= maxSelections && (
+                        <p className="text-sm text-muted-foreground">
+                            Máximo de {maxSelections} disciplinas atingido
+                        </p>
+                    )}
+                </div>
+                <FormMessage />
+            </FormItem>
+        )}
+    />
+);
+
+export { BaseFormField, SelectFormField, IconSelector, MultiSelectFormField };

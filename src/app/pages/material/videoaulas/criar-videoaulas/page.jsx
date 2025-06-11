@@ -82,7 +82,7 @@ export default function CriarVideoaulasPage() {
                 return;
             }
 
-            const response = await fetch('https://api-studdy.onrender.com/teacher/videos', {
+            const response = await fetch('http://localhost:3000/teacher/videos', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -220,4 +220,4 @@ export default function CriarVideoaulasPage() {
             </div>
         </div>
     );
-}
+}   

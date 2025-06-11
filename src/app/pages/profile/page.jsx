@@ -1,5 +1,11 @@
 'use client';
 
+/**
+ * Página de Perfil do Usuário
+ * Permite visualizar e editar informações pessoais do usuário
+ * Inclui dados como nome, email, data de nascimento e outras informações
+ */
+
 import { useState, useEffect } from 'react';
 import {
 	User,
@@ -21,6 +27,10 @@ import { Separator } from '@/components/ui/separator';
 import Cookies from 'js-cookie';
 import { toast } from 'sonner';
 
+/**
+ * Componente da página de perfil
+ * Permite edição inline dos dados do usuário
+ */
 export default function Profile() {
 	const [isEditing, setIsEditing] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
@@ -45,7 +55,7 @@ export default function Profile() {
 					return;
 				}
 
-				const response = await fetch(`https://api-studdy.onrender.com/user/${userId}`, {
+				const response = await fetch(`http://localhost:3000/user/${userId}`, {
 					method: 'GET',
 					headers: {
 						'Content-Type': 'application/json',
@@ -88,7 +98,7 @@ export default function Profile() {
 		try {
 			const userId = Cookies.get('userId');
 			
-			const response = await fetch(`https://api-studdy.onrender.com/admin/users/${userId}`, {
+			const response = await fetch(`http://localhost:3000/admin/users/${userId}`, {
 				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/json',
@@ -194,7 +204,7 @@ export default function Profile() {
 								</div>
 								<div className="flex items-center gap-3">
 									<Clock className="h-5 w-5 text-primary" />
-									<Label className="min-w-[120px] font-medium">Membro desde:</Label>
+									<Label className="min-w-[120px] font-medium">Cadastrado desde:</Label>
 									<span className="text-muted-foreground">{profile.createdAt}</span>
 								</div>
 								<div className="flex items-center gap-3">

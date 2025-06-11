@@ -5,6 +5,10 @@ import Cookies from 'js-cookie';
 
 const UserContext = createContext();
 
+/**
+ * UserProvider - Context provider para gerenciamento de estado do usuário
+ * Gerencia role do usuário e sincronização com cookies
+ */
 export function UserProvider({ children }) {
     const [userRole, setUserRole] = useState(() => {
         // Verifica se estamos no cliente antes de acessar cookies
@@ -33,7 +37,10 @@ export function UserProvider({ children }) {
         }
     }, [userRole]);
 
-    // Função para atualizar a role do usuário
+    /**
+     * Função para atualizar a role do usuário
+     * Normaliza para lowercase e atualiza cookie
+     */
     const updateUserRole = (newRole) => {
         const normalizedRole = newRole.toLowerCase();
         setUserRole(normalizedRole);
@@ -49,6 +56,10 @@ export function UserProvider({ children }) {
     );
 }
 
+/**
+ * Hook useUser - Acessa o contexto do usuário
+ * Retorna dados e funções para gerenciar estado do usuário
+ */
 export function useUser() {
     const context = useContext(UserContext);
     if (!context) {

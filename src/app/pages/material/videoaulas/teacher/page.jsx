@@ -24,7 +24,7 @@ export default function TeacherVideoaulasPage() {
                     return;
                 }
 
-                const response = await fetch('https://api-studdy.onrender.com/teacher/videos', {
+                const response = await fetch('http://localhost:3000/teacher/videos', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -55,7 +55,7 @@ export default function TeacherVideoaulasPage() {
                 return;
             }
 
-            const response = await fetch(`https://api-studdy.onrender.com/teacher/videos/${videoId}`, {
+            const response = await fetch(`http://localhost:3000/teacher/videos/${videoId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -232,4 +232,4 @@ export default function TeacherVideoaulasPage() {
             </div>
         </div>
     );
-}
+} 

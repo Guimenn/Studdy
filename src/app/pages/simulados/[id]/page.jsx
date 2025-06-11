@@ -1,5 +1,11 @@
 'use client';
 
+/**
+ * Página de Questões do Simulado
+ * Permite que estudantes respondam questões de um simulado específico
+ * Inclui funcionalidades de navegação, submissão e visualização de resultados
+ */
+
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,7 +19,10 @@ import { useUser } from "@/contexts/UserContext";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
 
-
+/**
+ * Componente da página de questões do simulado
+ * Gerencia estado das respostas e submissão do simulado
+ */
 export default function SimuladoQuestoesPage() {
     const params = useParams();
     const router = useRouter();
@@ -89,7 +98,7 @@ export default function SimuladoQuestoesPage() {
         if (!token) return null;
 
         try {
-            const quizzesResponse = await fetch('https://api-studdy.onrender.com/student/quizzes', {
+            const quizzesResponse = await fetch('http://localhost:3000/student/quizzes', {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -193,7 +202,7 @@ export default function SimuladoQuestoesPage() {
                     subjectId = simulado.subject.id;
                 } else {
                     // Se não temos o simulado carregado, precisamos buscar o subject_id
-                    const quizInfoResponse = await fetch(`https://api-studdy.onrender.com/quiz/${params.id}`, {
+                    const quizInfoResponse = await fetch(`http://localhost:3000/quiz/${params.id}`, {
                         method: 'GET',
                         headers: {
                             'Content-Type': 'application/json',
@@ -215,7 +224,7 @@ export default function SimuladoQuestoesPage() {
                 }
 
                 // Iniciar novo attempt
-                const response = await fetch(`https://api-studdy.onrender.com/student/subjects/${subjectId}/quizzes/${params.id}/start`, {
+                const response = await fetch(`http://localhost:3000/student/subjects/${subjectId}/quizzes/${params.id}/start`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -239,7 +248,7 @@ export default function SimuladoQuestoesPage() {
             // Verificar se é um attempt em progresso ou um novo attempt
             if (currentQuiz && currentQuiz.hasInProgressAttempt) {
                 // Para attempt em progresso, precisamos buscar as questões separadamente
-                const quizResponse = await fetch(`https://api-studdy.onrender.com/quiz/${params.id}`, {
+                const quizResponse = await fetch(`http://localhost:3000/quiz/${params.id}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -392,21 +401,21 @@ export default function SimuladoQuestoesPage() {
                 throw new Error('Token não encontrado');
             }
 
+            // Verificar se todas as questões foram respondidas
+            if (Object.keys(respostasUsuario).length !== questoes.length) {
+                throw new Error('Por favor, responda todas as questões antes de finalizar.');
+            }
+
             // Transformar o objeto respostasUsuario no formato esperado
             const responses = Object.entries(respostasUsuario).map(([questionId, markedAlternativeId]) => ({
                 questionId: parseInt(questionId),
                 markedAlternativeId: parseInt(markedAlternativeId)
             }));
 
-            const dataToSend = {
-                responses: responses
-            };
-
-            console.log('Enviando dados das respostas:', dataToSend);
-            console.log('Attempt ID:', attempt.id);
+            const dataToSend = { responses };
 
             // Enviar as respostas
-            const submitResponse = await fetch(`https://api-studdy.onrender.com/student/attempt/${attempt.id}/submit`, {
+            const submitResponse = await fetch(`http://localhost:3000/student/attempt/${attempt.id}/submit`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -415,31 +424,40 @@ export default function SimuladoQuestoesPage() {
                 body: JSON.stringify(dataToSend),
             });
 
+            if (!submitResponse.ok) {
+                const errorData = await submitResponse.json();
+                throw new Error(errorData.message || 'Erro ao enviar respostas');
+            }
+
             const submitData = await submitResponse.json();
-            console.log('Resposta da tentativa:', submitData);
+            console.log('Resposta do envio:', submitData);
 
             // Marcar o attempt como completed
-            await fetch(`https://api-studdy.onrender.com/student/attempt/${attempt.id}`, {
+            const completeResponse = await fetch(`http://localhost:3000/student/attempt/${attempt.id}`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    status: 'completed'
-                }),
+                body: JSON.stringify({ status: 'completed' }),
             });
 
-            setConcluido(true); // Marcar como concluído
+            if (!completeResponse.ok) {
+                const errorData = await completeResponse.json();
+                throw new Error(errorData.message || 'Erro ao finalizar tentativa');
+            }
+
+            const completeData = await completeResponse.json();
+            console.log('Resposta da finalização:', completeData);
+
+            setConcluido(true);
             toast.success('Simulado respondido com sucesso!');
-            console.log('Attempt marcado como completed');
-            
-            // Redirecionar para a página de resultado
             router.push(`/pages/simulados/${attempt.id}/result`);
             
         } catch (error) {
-            handleFetchError(error, 'responder simulado');
-            setError('Erro ao responder simulado. Tente novamente.');
+            console.error('Erro ao enviar respostas:', error);
+            toast.error(error.message || 'Erro ao responder simulado. Tente novamente.');
+            setError(error.message || 'Erro ao responder simulado. Tente novamente.');
         } finally {
             setIsLoading(false);
         }

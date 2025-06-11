@@ -1,4 +1,11 @@
 'use client';
+
+/**
+ * Componentes de formulário reutilizáveis
+ * Integração com React Hook Form para validação e gerenciamento de estado
+ * Fornece componentes Form, FormField, FormItem, FormLabel, FormControl, FormDescription e FormMessage
+ */
+
 import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { Controller, FormProvider, useFormContext, useFormState } from 'react-hook-form';
@@ -6,10 +13,19 @@ import { Controller, FormProvider, useFormContext, useFormState } from 'react-ho
 import { cn } from '@/lib/utils';
 import { Label } from '@/components/ui/label';
 
+/**
+ * Componente Form principal - wrapper do FormProvider
+ */
 const Form = FormProvider;
 
+/**
+ * Context para compartilhar informações do campo
+ */
 const FormFieldContext = React.createContext({});
 
+/**
+ * Componente FormField - wrapper do Controller do React Hook Form
+ */
 const FormField = ({ ...props }) => {
 	return (
 		<FormFieldContext.Provider value={{ name: props.name }}>

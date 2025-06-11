@@ -1,4 +1,11 @@
 'use client';
+
+/**
+ * Página de Simulados
+ * Lista e gerencia simulados disponíveis com filtros por status e matéria
+ * Permite visualizar, editar e arquivar simulados baseado no papel do usuário
+ */
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,6 +27,9 @@ import {
     DialogDescription,
 } from "@/components/ui/dialog";
 
+/**
+ * Opções de filtro por status de visibilidade
+ */
 const statusVisibility = [
     { id: 'todos', label: 'Todos' },
     { id: QuizVisibility.DRAFT, label: 'Rascunho' },
@@ -54,7 +64,7 @@ export default function SimuladosPage() {
                 toast.error('Token não encontrado');
                 return;
             }
-            const response = await fetch('https://api-studdy.onrender.com/student/quizzes', {
+            const response = await fetch('http://localhost:3000/student/quizzes', {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'

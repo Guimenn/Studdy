@@ -1,5 +1,11 @@
 'use client';
 
+/**
+ * Página de Login da aplicação Studdy
+ * Formulário de autenticação com validação usando Zod e React Hook Form
+ * Gerencia login de usuários e redirecionamento baseado no papel
+ */
+
 import Logo from '@/components/ui/logo';
 import { Button } from '@/components/ui/button';
 import {
@@ -21,11 +27,17 @@ import { z } from 'zod';
 import { useUser } from "@/contexts/UserContext";
 import Cookies from 'js-cookie';
 
+/**
+ * Schema de validação do formulário de login
+ */
 const formSchema = z.object({
 	email: z.string().email('E-mail inválido'),
 	password: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres'),
 });
 
+/**
+ * Componente da página de login
+ */
 export default function LoginPage() {
 	const router = useRouter();
 	const [isLoading, setIsLoading] = useState(false);
@@ -45,7 +57,7 @@ export default function LoginPage() {
 		try {
 
 			console.log('Dados enviados:', data);
-			const response = await fetch('https://api-studdy.onrender.com/login', {
+			const response = await fetch('http://localhost:3000/login', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

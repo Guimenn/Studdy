@@ -28,7 +28,7 @@ export default function SimuladoResultadoPage() {
                 if (!token) throw new Error("Token não encontrado");
 
                 console.log('Buscando resultados para tentativa:', attemptId);
-                const response = await fetch(`https://api-studdy.onrender.com/student/attempt/${attemptId}/responses`, {
+                const response = await fetch(`http://localhost:3000/student/attempt/${attemptId}/responses`, {
                     headers: {
                         "Authorization": `Bearer ${token}`,
                         "Content-Type": "application/json",
@@ -61,7 +61,8 @@ export default function SimuladoResultadoPage() {
 
     const correctAnswers = resultado.responses.filter(r => r.is_correct).length;
     const totalQuestions = resultado.responses.length;
-    const scorePercentage = Math.round((resultado.total_score / totalQuestions) * 100);
+    const totalPossiblePoints = resultado.responses.reduce((sum, resp) => sum + parseInt(resp.question.points), 0);
+    const scorePercentage = totalPossiblePoints > 0 ? Math.round((parseInt(resultado.total_score) / totalPossiblePoints) * 100) : 0;
     const correctPercentage = Math.round((correctAnswers / totalQuestions) * 100);
     const timeInMinutes = Math.round((new Date(resultado.finished_at) - new Date(resultado.started_at)) / 1000 / 60);
 
@@ -80,23 +81,15 @@ export default function SimuladoResultadoPage() {
                                     <div>
                                         <p className="text-sm text-blue-600 font-medium">Pontuação Total</p>
                                         <p className="text-2xl font-bold text-blue-700 mt-1">
-                                            {resultado.total_score} / {totalQuestions}
+                                            {resultado.total_score} / {totalPossiblePoints}
+                                        </p>
+                                        <p className="text-sm text-blue-600 mt-1">
+                                            {scorePercentage}% de acerto
                                         </p>
                                     </div>
                                     <div className="bg-blue-100 p-3 rounded-lg">
                                         <CheckCircle className="h-6 w-6 text-blue-600" />
                                     </div>
-                                </div>
-                                <div className="mt-2">
-                                    <div className="h-2 bg-blue-200 rounded-full">
-                                        <div 
-                                            className="h-2 bg-blue-600 rounded-full transition-all duration-500"
-                                            style={{ width: `${scorePercentage}%` }}
-                                        />
-                                    </div>
-                                    <p className="text-sm text-blue-600 mt-1">
-                                        {scorePercentage}% de acerto
-                                    </p>
                                 </div>
                             </div>
 
@@ -107,21 +100,13 @@ export default function SimuladoResultadoPage() {
                                         <p className="text-2xl font-bold text-green-700 mt-1">
                                             {correctAnswers} / {totalQuestions}
                                         </p>
+                                        <p className="text-sm text-green-600 mt-1">
+                                            {correctPercentage}% de acerto
+                                        </p>
                                     </div>
                                     <div className="bg-green-100 p-3 rounded-lg">
                                         <CircleCheck className="h-6 w-6 text-green-600" />
                                     </div>
-                                </div>
-                                <div className="mt-2">
-                                    <div className="h-2 bg-green-200 rounded-full">
-                                        <div 
-                                            className="h-2 bg-green-600 rounded-full transition-all duration-500"
-                                            style={{ width: `${correctPercentage}%` }}
-                                        />
-                                    </div>
-                                    <p className="text-sm text-green-600 mt-1">
-                                        {correctPercentage}% de acerto
-                                    </p>
                                 </div>
                             </div>
 
@@ -226,4 +211,4 @@ export default function SimuladoResultadoPage() {
             </div>
         </div>
     );
-}
+} 

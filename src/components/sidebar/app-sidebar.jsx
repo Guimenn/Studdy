@@ -1,5 +1,11 @@
 "use client"
 
+/**
+ * Componente principal da sidebar da aplicação
+ * Renderiza navegação dinâmica baseada no papel do usuário (Admin, Teacher, Student)
+ * Inclui menu principal, projetos e informações do usuário
+ */
+
 import { useEffect, useState } from "react"
 import {
   BookOpen,
@@ -77,7 +83,7 @@ const dataProfessor = {
         { title: "Minhas Videoaulas", url: "/pages/material/videoaulas/teacher" },
         { title: "Criar Videoaulas", url: "/pages/material/videoaulas/criar-videoaulas" },
         { title: "Meus Resumos", url: "/pages/material/resumos/teacher" },
-        { title: "Criar Resumos", url: "/pages/material/resumos/criar-resumos" },
+        { title: "Criar Resumos", url: "/pages/turmas/teacher" },
       ],
     },
   ],
@@ -100,17 +106,7 @@ const dataAdmin = {
     { title: "Administração", url: "/pages/administracao", icon: BookOpen },
     { title: "Cadastro", url: "/pages/cadastro", icon: Bot },
   ],
-  navMainDropdown: [
-    {
-      title: "Biblioteca",
-      url: "/pages/material",
-      icon: BookOpen,
-      itemsDropdown: [
-        { title: "Videoaulas", url: "/pages/material/videoaulas" },
-        { title: "Resumos", url: "/pages/material/resumos" },
-      ],
-    },
-  ],
+
   projects: [
     { name: "Concursos", url: "/pages/concursos", icon: PieChart },
     { name: "Vestibulares", url: "/pages/vestibulares", icon: Map },
@@ -143,7 +139,6 @@ function AdminNav() {
   return (
     <>
       <NavMain items={dataAdmin.navMain} role="admin" />
-      <NavMainDropdown itemsDropdown={dataAdmin.navMainDropdown} role="admin" />
       <NavProjects projects={dataAdmin.projects} role="admin" />
     </>
   )

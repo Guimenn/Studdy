@@ -1,5 +1,11 @@
 'use client';
 
+/**
+ * Página de Videoaulas
+ * Permite visualizar e assistir videoaulas disponíveis para o estudante
+ * Inclui funcionalidades de busca e reprodução de vídeos
+ */
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,6 +15,10 @@ import Cookies from 'js-cookie';
 import { toast } from 'sonner';
 import Image from 'next/image';
 
+/**
+ * Componente da página de videoaulas
+ * Exibe lista de vídeos com busca e reprodução
+ */
 export default function VideoaulasPage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedVideo, setSelectedVideo] = useState(null);
@@ -24,7 +34,7 @@ export default function VideoaulasPage() {
                     return;
                 }
 
-                const response = await fetch('https://api-studdy.onrender.com/student/videos', {
+                const response = await fetch('http://localhost:3000/student/videos', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

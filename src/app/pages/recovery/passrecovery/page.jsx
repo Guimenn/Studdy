@@ -1,5 +1,11 @@
 'use client';
 
+/**
+ * Página de Recuperação de Senha
+ * Permite que usuários solicitem recuperação de senha via email
+ * Inclui validação de email e envio de código de verificação
+ */
+
 import React, { useState } from 'react';
 import emailjs from '@emailjs/browser';
 import Logo from '@/components/ui/logo';
@@ -26,7 +32,9 @@ import {
 	InputOTPSlot,
 } from "@/components/ui/input-otp"
 
-// Validação para o e-mail
+/**
+ * Schema de validação para o e-mail
+ */
 const formSchemaEmail = z.object({
 	recoveryemail: z.string().email('E-mail inválido'),
 });
@@ -70,7 +78,7 @@ export default function PassRecoveryPage() {
 
 		try {
 			// Verifica se o email existe na API
-			const response = await fetch(`https://api-studdy.onrender.com/login/recovery`, {
+			const response = await fetch(`http://localhost:3000/login/recovery`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

@@ -1,5 +1,11 @@
 "use client";
 
+/**
+ * Página de Administração
+ * Permite que administradores gerenciem usuários do sistema
+ * Inclui funcionalidades de busca, visualização e gerenciamento de usuários
+ */
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,6 +18,10 @@ import { PageLoader } from "@/components/ui/loader";
 import Cookies from 'js-cookie';
 import { toast } from 'sonner';
 
+/**
+ * Componente da página de administração
+ * Restrito apenas para usuários com role de admin
+ */
 export default function AdministracaoPage() {
     const { userRole } = useUser();
     const router = useRouter();
@@ -36,7 +46,7 @@ export default function AdministracaoPage() {
                 return;
             }
 
-            const response = await fetch('https://api-studdy.onrender.com/user', {
+            const response = await fetch('http://localhost:3000/user', {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'

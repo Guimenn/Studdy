@@ -88,7 +88,7 @@ export default function CriarResumosPage() {
                     return;
                 }
 
-                const response = await fetch('https://api-studdy.onrender.com/teacher/classes', {
+                const response = await fetch('http://localhost:3000/teacher/classes', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -120,7 +120,7 @@ export default function CriarResumosPage() {
                         return;
                     }
 
-                    const response = await fetch(`https://api-studdy.onrender.com/teacher/classes/${selectedClass}/subjects`, {
+                    const response = await fetch(`http://localhost:3000/teacher/classes/${selectedClass}/subjects`, {
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }
@@ -159,7 +159,7 @@ export default function CriarResumosPage() {
             }
 
 
-            const response = await fetch('https://api-studdy.onrender.com/generate/generate-resume', {
+            const response = await fetch('http://localhost:3000/generate/generate-resume', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -207,8 +207,8 @@ export default function CriarResumosPage() {
             };
 
             const url = isEditMode 
-                ? `https://api-studdy.onrender.com/teacher/resumes/${editId}`
-                : 'https://api-studdy.onrender.com/teacher/resumes';
+                ? `http://localhost:3000/teacher/resumes/${editId}`
+                : 'http://localhost:3000/teacher/resumes';
 
             const method = isEditMode ? 'PUT' : 'POST';
 
@@ -414,4 +414,4 @@ export default function CriarResumosPage() {
             </div>
         </div>
     );
-}
+} 

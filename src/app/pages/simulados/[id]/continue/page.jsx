@@ -18,7 +18,7 @@ export default function ContinueSimuladoPage() {
             }
 
             try {
-                const response = await fetch('https://api-studdy.onrender.com/student/quizzes', {
+                const response = await fetch('http://localhost:3000/student/quizzes', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,

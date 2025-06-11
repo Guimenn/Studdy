@@ -125,7 +125,7 @@ export default function CriarSimuladosPage() {
 				}
 
 				console.log('Buscando turmas...');
-				const response = await fetch('https://api-studdy.onrender.com/teacher/classes', {
+				const response = await fetch('http://localhost:3000/teacher/classes', {
 					headers: {
 						'Authorization': `Bearer ${token}`
 					}
@@ -166,7 +166,7 @@ export default function CriarSimuladosPage() {
 						return;
 					}
 
-					const response = await fetch(`https://api-studdy.onrender.com/teacher/classes/${selectedClass}/subjects`, {
+					const response = await fetch(`http://localhost:3000/teacher/classes/${selectedClass}/subjects`, {
 						headers: {
 							'Authorization': `Bearer ${token}`
 						}
@@ -210,7 +210,7 @@ export default function CriarSimuladosPage() {
 						return;
 					}
 
-					const response = await fetch(`https://api-studdy.onrender.com/teacher/simulados/${editId}`, {
+					const response = await fetch(`http://localhost:3000/teacher/simulados/${editId}`, {
 						headers: {
 							'Authorization': `Bearer ${token}`
 						}
@@ -265,8 +265,6 @@ export default function CriarSimuladosPage() {
 			title: titulo,
 			description: descricao,
 			icon: icone,
-			class_id: parseInt(selectedClass),
-			subject_id: parseInt(selectedSubject),
 			max_attempt: tentativas_maximas,
 			duration_minutes: duracao_minutos,
 			visibility: visibility.toLowerCase(),
@@ -299,8 +297,8 @@ export default function CriarSimuladosPage() {
 			
 			// Determinar URL e método baseado no modo de edição
 			const url = isEditMode 
-				? `https://api-studdy.onrender.com/teacher/simulados/${editId}`
-                : `https://api-studdy.onrender.com/teacher/classes/${selectedClass}/subjects/${selectedSubject}/quiz`;
+				? `http://localhost:3000/teacher/simulados/${editId}`
+				: `http://localhost:3000/teacher/classes/${selectedClass}/subjects/${selectedSubject}/quiz`;
 			
 			const method = isEditMode ? 'PUT' : 'POST';
 
@@ -341,7 +339,7 @@ export default function CriarSimuladosPage() {
 		setQuestions([...questions, {
 			id: Date.now(),
 			statement: '',
-			points: 1,
+			points: 10,
 			alternatives: [
 				{ id: Date.now(), text: '', isCorrect: true },
 				{ id: Date.now() + 1, text: '', isCorrect: false },

@@ -1,5 +1,11 @@
 import { NextResponse } from 'next/server';
 
+/**
+ * Middleware de autenticação e autorização Next.js
+ * Protege rotas baseado no papel do usuário (Admin, Teacher, Student)
+ * Verifica tokens JWT e redireciona usuários não autorizados
+ */
+
 // Define protected routes and their required roles
 const protectedRoutes = {
     admin: [
@@ -65,4 +71,4 @@ export const config = {
     matcher: [
         '/pages/:path*',
     ],
-}; 
+};
