@@ -46,7 +46,7 @@ export default function AdministracaoPage() {
                 return;
             }
 
-            const response = await fetch('http://localhost:3000/user', {
+            const response = await fetch('https://api-studdy.onrender.com/user', {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'

@@ -94,7 +94,7 @@ const PassRecoveryNewPass = () => {
                 passwordLength: data.newpassword.length
             });
 
-            const response = await fetch('http://localhost:3000/login/new-password', {
+            const response = await fetch('https://api-studdy.onrender.com/login/new-password', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

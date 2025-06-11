@@ -133,7 +133,7 @@ export default function ConcursosPage() {
 				if (!token) throw new Error('Token não encontrado');
 
 				console.log('Buscando lista de concursos');
-				const response = await fetch('http://localhost:3000/contestsEntrace/contests', {
+				const response = await fetch('https://api-studdy.onrender.com/contestsEntrace/contests', {
 					method: 'GET',
 					headers: {
 						Authorization: `Bearer ${token}`,
@@ -234,7 +234,7 @@ export default function ConcursosPage() {
 				console.log('Enviando dados do concurso:', concursoData);
 
 				// Enviar dados do concurso para o backend
-				const response = await fetch('http://localhost:3000/contestsEntrace/contests', {
+				const response = await fetch('https://api-studdy.onrender.com/contestsEntrace/contests', {
 					method: 'POST',
 					headers: {
 						Authorization: `Bearer ${token}`,
@@ -356,7 +356,7 @@ export default function ConcursosPage() {
 			const token = Cookies.get('token');
 			if (!token) throw new Error('Token não encontrado');
 
-			const response = await fetch(`http://localhost:3000/contestsEntrace/contests/${concursoToDelete.id}`, {
+			const response = await fetch(`https://api-studdy.onrender.com/contestsEntrace/contests/${concursoToDelete.id}`, {
 				method: 'DELETE',
 				headers: {
 					Authorization: `Bearer ${token}`,

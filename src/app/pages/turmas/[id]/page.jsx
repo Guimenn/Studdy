@@ -70,7 +70,7 @@ export default function TurmaDetalhesPage() {
       setIsLoading(true);
       setError(null);
       const token = Cookies.get('token');
-      const turmaResponse = await fetch(`http://localhost:3000/admin/classes/${params.id}`, {
+      const turmaResponse = await fetch(`https://api-studdy.onrender.com/admin/classes/${params.id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -107,7 +107,7 @@ export default function TurmaDetalhesPage() {
   const fetchTodosProfessores = async () => {
     try {
       const token = Cookies.get('token');
-      const response = await fetch('http://localhost:3000/admin/teachers', {
+      const response = await fetch('https://api-studdy.onrender.com/admin/teachers', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -126,7 +126,7 @@ export default function TurmaDetalhesPage() {
   const fetchDisciplinas = async () => {
     try {
       const token = Cookies.get('token');
-      const response = await fetch('http://localhost:3000/admin/subjects', {
+      const response = await fetch('https://api-studdy.onrender.com/admin/subjects', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -185,7 +185,7 @@ export default function TurmaDetalhesPage() {
         }))
       ];
 
-      const response = await fetch(`http://localhost:3000/admin/classes/${params.id}`, {
+      const response = await fetch(`https://api-studdy.onrender.com/admin/classes/${params.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -252,7 +252,7 @@ export default function TurmaDetalhesPage() {
         assignments: updatedAssignments
       });
       
-      const response = await fetch(`http://localhost:3000/admin/classes/${params.id}`, {
+      const response = await fetch(`https://api-studdy.onrender.com/admin/classes/${params.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

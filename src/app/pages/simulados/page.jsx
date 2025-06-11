@@ -64,7 +64,7 @@ export default function SimuladosPage() {
                 toast.error('Token não encontrado');
                 return;
             }
-            const response = await fetch('http://localhost:3000/student/quizzes', {
+            const response = await fetch('https://api-studdy.onrender.com/student/quizzes', {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'

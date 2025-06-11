@@ -60,7 +60,7 @@ export function NavUser() {
           return
         }
 
-        const response = await fetch(`http://localhost:3000/user/${userId}`, {
+        const response = await fetch(`https://api-studdy.onrender.com/user/${userId}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'

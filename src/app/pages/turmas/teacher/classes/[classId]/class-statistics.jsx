@@ -20,7 +20,7 @@ export default function ClassStatistics({ classId }) {
                     throw new Error('Token não encontrado');
                 }
 
-                const response = await fetch(`http://localhost:3000/teacher/classes/${classId}/statistics`, {
+                const response = await fetch(`https://api-studdy.onrender.com/teacher/classes/${classId}/statistics`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'

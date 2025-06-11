@@ -185,13 +185,13 @@ export default function TurmasPage() {
 				setIsLoading(true);
 				setError(null);
 				const token = Cookies.get('token');
-				const response = await fetch('http://localhost:3000/admin/classes', {
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json',
-						'Authorization': `Bearer ${token}`
-					},
-				});
+				const response = await fetch('https://api-studdy.onrender.com/admin/classes', {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${token}`
+				},
+			});
 
 				await handleApiError(response, 'buscar turmas');
 				const data = await response.json();
@@ -207,13 +207,13 @@ export default function TurmasPage() {
 		const fetchTeachers = async () => {
 			try {
 				const token = Cookies.get('token');
-				const response = await fetch('http://localhost:3000/admin/teachers', {
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json',
-						'Authorization': `Bearer ${token}`	
-					},
-				});
+				const response = await fetch('https://api-studdy.onrender.com/admin/teachers', {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${token}`	
+				},
+			});
 
 				await handleApiError(response, 'buscar professores');
 				const data = await response.json();
@@ -230,13 +230,13 @@ export default function TurmasPage() {
 		const fetchSubjects = async () => {
 			try {
 				const token = Cookies.get('token');
-				const response = await fetch('http://localhost:3000/admin/subjects', {
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json',
-						'Authorization': `Bearer ${token}`
-					},
-				});
+				const response = await fetch('https://api-studdy.onrender.com/admin/subjects', {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${token}`
+				},
+			});
 
 				await handleApiError(response, 'buscar disciplinas');
 				const data = await response.json();
@@ -357,7 +357,7 @@ export default function TurmasPage() {
 		try {
 			setIsLoading(true);
 			const token = Cookies.get('token');
-			const response = await fetch(`http://localhost:3000/admin/classes/${turmaToDelete.id}`, {
+			const response = await fetch(`https://api-studdy.onrender.com/admin/classes/${turmaToDelete.id}`, {
 				method: 'DELETE',
 				headers: {
 					'Content-Type': 'application/json',
@@ -420,7 +420,7 @@ export default function TurmasPage() {
 			console.log('Enviando dados:', dataToSend);
 		
 
-			const response = await fetch('http://localhost:3000/admin/classes', {
+			const response = await fetch('https://api-studdy.onrender.com/admin/classes', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

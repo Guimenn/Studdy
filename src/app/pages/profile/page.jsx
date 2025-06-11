@@ -55,7 +55,7 @@ export default function Profile() {
 					return;
 				}
 
-				const response = await fetch(`http://localhost:3000/user/${userId}`, {
+				const response = await fetch(`https://api-studdy.onrender.com/user/${userId}`, {
 					method: 'GET',
 					headers: {
 						'Content-Type': 'application/json',
@@ -98,7 +98,7 @@ export default function Profile() {
 		try {
 			const userId = Cookies.get('userId');
 			
-			const response = await fetch(`http://localhost:3000/admin/users/${userId}`, {
+			const response = await fetch(`https://api-studdy.onrender.com/admin/users/${userId}`, {
 				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/json',

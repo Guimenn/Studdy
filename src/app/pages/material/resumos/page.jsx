@@ -32,7 +32,7 @@ export default function ResumosPage() {
                     return;
                 }
 
-                const response = await fetch('http://localhost:3000/student/resumes', {
+                const response = await fetch('https://api-studdy.onrender.com/student/resumes', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

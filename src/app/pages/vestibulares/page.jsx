@@ -95,7 +95,7 @@ export default function VestibularesPage() {
         if (!token) throw new Error('Token não encontrado');
 
         console.log('Buscando lista de vestibulares');
-        const response = await fetch('http://localhost:3000/contestsEntrace/entrance-exams', {
+        const response = await fetch('https://api-studdy.onrender.com/contestsEntrace/entrance-exams', {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,
@@ -211,7 +211,7 @@ export default function VestibularesPage() {
 
         // Enviar dados do vestibular para o backend
         const response = await fetch(
-          'http://localhost:3000/contestsEntrace/entrance-exams',
+          'https://api-studdy.onrender.com/contestsEntrace/entrance-exams',
           {
             method: 'POST',
             headers: {
@@ -329,7 +329,7 @@ export default function VestibularesPage() {
       const token = Cookies.get('token');
       if (!token) throw new Error('Token não encontrado');
 
-      const response = await fetch(`http://localhost:3000/contestsEntrace/entrance-exams/${vestibularToDelete.id}`, {
+      const response = await fetch(`https://api-studdy.onrender.com/contestsEntrace/entrance-exams/${vestibularToDelete.id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,

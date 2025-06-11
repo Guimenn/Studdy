@@ -65,7 +65,7 @@ export default function ClassDetailsClient({ classId }) {
                 throw new Error('Token não encontrado');
             }
 
-            const response = await fetch(`http://localhost:3000/teacher/classes/${classId}`, {
+            const response = await fetch(`https://api-studdy.onrender.com/teacher/classes/${classId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -130,7 +130,7 @@ export default function ClassDetailsClient({ classId }) {
                     throw new Error('Token não encontrado');
                 }
 
-                const response = await fetch(`http://localhost:3000/teacher/quiz/${quiz.id}`, {
+                const response = await fetch(`https://api-studdy.onrender.com/teacher/quiz/${quiz.id}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${token}`,

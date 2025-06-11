@@ -37,7 +37,7 @@ export default function StudentClassPage() {
         const fetchClassData = async () => {
             try {
                 const token = Cookies.get('token');
-                const response = await fetch('http://localhost:3000/student/class', {
+                const response = await fetch('https://api-studdy.onrender.com/student/class', {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
