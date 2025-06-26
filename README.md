@@ -61,6 +61,13 @@ npm run dev
 
 ```
 
+5. Login Padrão ADMIN
+```
+login: admin@admin.com
+password: admin123
+
+```
+
 ## 👥 Colaboradores
 
 <table align="start">
